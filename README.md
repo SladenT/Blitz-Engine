@@ -2,7 +2,7 @@ This is the capstone project for Shepherd University students Davis Teigeler, Aa
 
 ## Build Instructions
 
-Install MinGW (this was setup using version 12.2, but the latest should work), to ensure you get the gcc compiler
-Add the folder to VSCode
-Create a "bin" subdirectory and move the glfw3.dll from lib into that folder
-Run it using the play button
+1. Install MinGW (this was setup using version 12.2, but the latest should work), to ensure you get the gcc compiler
+2. Add the folder to VSCode
+3. Create a "bin" subdirectory and move the glfw3.dll from lib into that folder
+4. Run it using the play button
