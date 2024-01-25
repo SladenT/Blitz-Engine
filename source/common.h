@@ -6,6 +6,7 @@
 #ifndef commonh
 #define commonh
 #include "stdint.h"
+#include "stdbool.h"
 
 
 

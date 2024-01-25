@@ -57,7 +57,7 @@ void ar_ArrayAlloc(Arena *a, void **mem, int count)
 	//We should attempt to get our fragmented memory, if any.
 	if (a->firstEmpty != 0)
 	{
-		MemPosition *m;
+		MemPosition *m = {1};
 		while (m != 0 && count > 0)
 		{
 			mem[i] = a->firstEmpty->pos;

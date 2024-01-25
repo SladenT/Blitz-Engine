@@ -9,16 +9,17 @@
                 "-g",
                 "*.c",
                 "-o",
-                "${fileDirname}\\..\\bin\\${fileBasenameNoExtension}.exe",
+                "${fileDirname}\\..\\bin\\Game.exe",
                 "-I",
                 "${fileDirname}\\..\\include",
                 "-L",
                 "${fileDirname}\\..\\lib",
+                "-lassimp-vc142-mtd",
+                "-lcglm",
                 "-lglfw3",
                 "-lopengl32",
                 "-std=c99",
-                "-Wall",
-                "-Og"
+                "-Wall"
             ],
             "options": {
                 "cwd": "${fileDirname}"
