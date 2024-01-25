@@ -26,6 +26,7 @@ typedef struct
 	uint64_t     size;	     // The size of the memory for each item within the Arena.
 	uint64_t     psize;		 // The actually allocated size of our memory.  If offset is greater than this, we need to expand.
 	MemPosition *firstEmpty; // For dynamic allocation, allows us to pop things out of the middle of the stack if necessary.
+	MemPosition *skip;		 // Skip memory holder for iteration purposes
 } Arena;
 
 
@@ -34,12 +35,14 @@ void  PopMemory(Arena *a, uint64_t size);
 Arena *CreateArena(uint64_t chunk, uint8_t size, uint32_t initChunks);
 void DestroyArena(Arena *a);
 void ar_ClearAll(Arena *a);
-void ar_ArrayAlloc(Arena *a, void **mem, int count);
+void** ar_ArrayAlloc(Arena *a, int count);
 void ar_Free(Arena *a, void *m);
+void* ar_AllocOneFromArray(Arena *a);
+void* ar_ArenaIterator(Arena *a, int *i);
 
 //Some macros to make things a bit simpler
 #define MakeDataArena(type, VirtualGB, pageCount)     CreateArena(sizeof(type), VirtualGB, pageCount)
-#define ar_AllocOne(arena, pointer)				   	  ar_ArrayAlloc(arena, (void**)pointer, 1)
+#define ar_AllocOne(arena)						   	  ar_AllocOneFromArray(arena)
 
 // By going in reverse in our array, we should be freeing from the top of the stack if possible
 #define ar_FreeArray(arena, array, count)		   for (int i = count-1; i >= 0; i--){ar_Free(arena,array[i]);}

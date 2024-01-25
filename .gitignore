@@ -1,1 +1,4 @@
 bin
+*.exe
+*.bat
+*.lnk

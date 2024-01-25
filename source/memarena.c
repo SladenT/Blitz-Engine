@@ -51,8 +51,9 @@ void DestroyArena(Arena *a)
 
 // mem should be an array of UNITITIALIZED pointers (might want to change into an array instead of a pointer pointer
 // to avoid free and malloc)
-void ar_ArrayAlloc(Arena *a, void **mem, int count)
+void** ar_ArrayAlloc(Arena *a, int count)
 {
+	void** mem = malloc(sizeof(void*) * count);
 	int i = 0;
 	//We should attempt to get our fragmented memory, if any.
 	if (a->firstEmpty != 0)
@@ -69,7 +70,7 @@ void ar_ArrayAlloc(Arena *a, void **mem, int count)
 		}
 		if (count == 0)
 		{
-			return;
+			return mem;
 		}
 	}
 	void *initm = PushMemory(a, count);
@@ -81,11 +82,22 @@ void ar_ArrayAlloc(Arena *a, void **mem, int count)
 			i++;
 			k++;
 		}
+		return mem;
 	}
 	else
 	{
 		printf("Array allocation failed on stack!");
+		free(mem);
+		return NULL;
 	}
+}
+
+void* ar_AllocOneFromArray(Arena *a)
+{
+	void** m = ar_ArrayAlloc(a, 1);
+	void* mem = m[0];
+	free(m);
+	return mem;
 }
 
 void ar_Free(Arena *a, void *m)
@@ -101,6 +113,30 @@ void ar_Free(Arena *a, void *m)
 	d->pos = m;
 	d->next = a->firstEmpty;
 	a->firstEmpty = d;
+}
+
+// Jumps over our fragmented memory and returns only allocated memory positions
+void* ar_ArenaIterator(Arena *a, int *i)
+{
+	//void* mem;
+	while(true)
+	{
+		if (a->firstEmpty != NULL && (a->mem + ((*i)*a->size)) == a->firstEmpty)
+		{
+			*i++;
+			a->skip = a->firstEmpty->next;
+			continue;
+		}
+		if (a->skip != NULL && (a->mem + ((*i)*a->size)) == a->skip)
+		{
+			*i++;
+			MemPosition* hold = a->skip->next;
+			a->skip = hold;
+			continue;
+		}
+		return a->mem + ((*i)*a->size);
+	}
+	
 }
 
 void ar_ClearAll(Arena *a)

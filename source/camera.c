@@ -27,7 +27,6 @@ static void InitializeMainCamera(float aspectRatio)
     // Initial View
     mat4 view;
 	glmc_mat4_identity(view);
-	glmc_translate(view, (vec3){0.0f, 0.0f, -100.0f});
     vec3 cameraPos   = {0.0f, 2.0f,  3.0f};
 	vec3 cameraFront = {0.0f, -0.5f,  -1.0f};
 	vec3 cameraUp    = {0.0f, 1.0f,  0.0f};

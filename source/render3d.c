@@ -2,7 +2,7 @@
  *	Rendering methods and pipeline.  Meshes are logically ordered into groups, and similar
  *  Meshes should be placed in similar groups.
  *
- *   Created by Davis Teigeler
+ *  Created by Davis Teigeler
  ********************************************************************************************/
 // #include <assimp/cimport.h>
 
@@ -14,6 +14,8 @@
 #include <cglm/call.h>
 #include <stdio.h>
 
+#define SHADER_GROUP_MAX_COUNT 128
+
 unsigned int SCR_WIDTH = 960;
 unsigned int SCR_HEIGHT = 540;
 
@@ -21,7 +23,8 @@ Shader s;
 Model* m;
 Camera* c;
 
-double lastTime = 0.0f;
+ShaderGroup shaderGroups[SHADER_GROUP_MAX_COUNT];
+int shaderCount = 0;
 
 // Test box
 float vertices[] = {
@@ -86,6 +89,11 @@ static void error_callback(int error, const char* description)
 }
 // #endregion
 
+// #region Forward Declarations
+void r3d_GenerateMeshOne(Model *mod, float vertexData[], int vertAttCount);
+Model* r3d_GenerateModelOne(float vertexData[], int vertAttCount, Shader s);
+// #endregion
+
 GLFWwindow* r3d_InitWindowRender(void)
 {
     if (!glfwInit())
@@ -119,18 +127,32 @@ GLFWwindow* r3d_InitWindowRender(void)
 
     // Temp for test display
     s = sh_BuildShader("def.vs", "def.fs");
-    m = malloc(sizeof(Model));
-    r3d_GenerateMeshOne(m, vertices);
+    m = r3d_GenerateModelOne(vertices, 150, s);
+    //r3d_GenerateMeshOne(m, vertices, 150);
     c = cam_GetMainCamera();
-    mat4 transform;
-	versor q;
-	glmc_mat4_identity(m->transform);
-	glmc_mat4_quat(m->transform, q);
-    lastTime = glfwGetTime();
     return window;
 }
 
-void r3d_GenerateMeshOne(Model *mod, float vertexData[])
+Model* r3d_GenerateModelOne(float vertexData[], int vertAttCount, Shader s)
+{
+    if (shaderCount == 0)
+    {
+        shaderGroups[0].s = s;
+        // TODO: Get texture array for this shader
+        shaderGroups[0].models = MakeDataArena(Model, 1, 4);
+        shaderGroups[0].modelCt = 1;
+        Model *m = ar_AllocOne(shaderGroups[0].models);
+        r3d_GenerateMeshOne(m, vertexData, vertAttCount);
+        versor q;
+        glmc_mat4_identity(m->transform);
+        glmc_mat4_quat(m->transform, q);
+        shaderCount++;
+        return m;
+    }
+    return NULL;
+}
+
+void r3d_GenerateMeshOne(Model *mod, float vertexData[], int vertAttCount)
 {
     /* uint32_t VAO;  //Vertex Array Object, which stores our VBO and EBO
 	uint32_t VBO;  //Vertex Buffer Object, which stores our vertex/texture/misc. data for the shader to use
@@ -139,7 +161,7 @@ void r3d_GenerateMeshOne(Model *mod, float vertexData[])
     glGenBuffers(1, &mod->mesh.VBO);
     glBindVertexArray(mod->mesh.VAO);
     glBindBuffer(GL_ARRAY_BUFFER, mod->mesh.VBO);
-    glBufferData(GL_ARRAY_BUFFER, 150*sizeof(float), vertexData, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertAttCount*sizeof(float), vertexData, GL_STATIC_DRAW);
 
     //Verts
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
@@ -149,10 +171,8 @@ void r3d_GenerateMeshOne(Model *mod, float vertexData[])
     glEnableVertexAttribArray(1);
 }
 
-void r3d_RenderPass(GLFWwindow* window)
+void r3d_RenderPass(GLFWwindow* window, double deltaTime)
 {
-    double deltaTime = glfwGetTime() - lastTime;
-    lastTime = glfwGetTime();
     // TEMPORARY
     int vertexColorLocation = glGetUniformLocation(s.ID, "ourColor");
 	int vertexTransformLoc = glGetUniformLocation(s.ID, "transform");
@@ -167,17 +187,24 @@ void r3d_RenderPass(GLFWwindow* window)
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT  | GL_DEPTH_BUFFER_BIT);
 
-    sh_UseShader(s.ID);
+    for (int i = 0; i < shaderCount; i++)
+    {
+        sh_UseShader(shaderGroups[i].s.ID);
         glUniformMatrix4fv(vertexProjectionLoc, 1, GL_FALSE, (float *)c->projection);
         glUniform4f(vertexColorLocation, rValue, gValue, bValue, 1.0f);
-        glUniformMatrix4fv(vertexTransformLoc, 1, GL_FALSE, (float *)m->transform);
         glUniformMatrix4fv(vertexViewLoc, 1, GL_FALSE, (float *)c->transform);
 
-        glBindVertexArray(m->mesh.VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
-
-
+        for (int i = 0; i < shaderGroups[i].modelCt; i++)
+        {
+            Model* model = ar_ArenaIterator(shaderGroups[i].models, &i);
+            glUniformMatrix4fv(vertexTransformLoc, 1, GL_FALSE, (float *)model->transform);
+            glBindVertexArray(m->mesh.VAO);
+            // Need to get the actual vertex count at some point...
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            glBindVertexArray(0);
+        }
+        
+    }
     glfwSwapBuffers(window);
     glfwPollEvents();
 }

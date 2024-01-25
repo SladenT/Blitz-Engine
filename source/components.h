@@ -21,10 +21,9 @@ typedef struct
 
 typedef struct __attribute__((__packed__)) // 120 Bytes (it doesn't properly pack mesh otherwise)
 {
-	mat4 	  transform;  
-	Mesh 	  mesh;	  
+	mat4 	  transform;
+	Mesh 	  mesh;
 	uint32_t  textures[8];  // An array of references to our various textures.
-							// To reduce texture bind calls, we'll group our models by the 0th index of this array.
 	uint32_t  texCount;		// Lets us know the size of our texture array.  Can be 0, for no textures.
 	uint64_t  ID;		 	// Entity ID
 } Model;

@@ -18,14 +18,10 @@ typedef struct
 
 typedef struct
 {
-	uint32_t texref;	// The gpu id of the relevant texture
-	Arena	*models;	// The memory locations of all our models within the texture group;
-} TextureGroup;
-
-typedef struct
-{
 	Shader s;
-	Arena *tgroups;	    // The memory locations of all the texture groups within the shader group
+	uint32_t texref;	// The gpu id of the relevant texture array
+	Arena	*models;	// The memory locations of all our models within the texture group;
+	uint32_t modelCt;
 } ShaderGroup;
 
 

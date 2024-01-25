@@ -8,7 +8,7 @@
 // Initializes our program and sets up the OpenGL contex and our window
 GLFWwindow* r3d_InitWindowRender(void);
 
-void r3d_RenderPass(GLFWwindow* window);
+void r3d_RenderPass(GLFWwindow* window, double deltaTime);
 
 
 
