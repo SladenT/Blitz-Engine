@@ -8,6 +8,8 @@
 #include "stdint.h"
 #include "stdbool.h"
 
+// comment this out for release
+#define DEBUG
 
 
 

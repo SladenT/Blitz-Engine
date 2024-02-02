@@ -43,7 +43,31 @@ Arena *CreateArena(uint64_t chunk, uint8_t size, uint32_t pages)
 	return a;
 }
 
+DynamicArena *CreateDynamicArena(uint8_t size, uint32_t pages)
+{
+	if (pages*PAGE > size*GB)
+	{
+		printf("Failed to create memory arena due to desired size being greater than virtual size!");
+		return (DynamicArena*){0};
+	}
+	DynamicArena *a = malloc(sizeof(DynamicArena));
+	// Reserve virtual space so our dats is continuous and not fragmented even if we expand later
+	a->mem = VirtualAlloc(NULL, size*GB, MEM_RESERVE, PAGE_NOACCESS);
+	a->offset = 0;
+	a->max = size;
+	a->psize = pages*PAGE;
+	// Commit actual physical memory
+	VirtualAlloc(a->mem, pages*PAGE, MEM_COMMIT, PAGE_READWRITE);
+	return a;
+}
+
 void DestroyArena(Arena *a)
+{
+	VirtualFree(a->mem, 0, MEM_RELEASE);
+	free(a);
+}
+
+void DestroyDynamicArena(DynamicArena *a)
 {
 	VirtualFree(a->mem, 0, MEM_RELEASE);
 	free(a);
@@ -97,6 +121,24 @@ void* ar_AllocOneFromArray(Arena *a)
 	void** m = ar_ArrayAlloc(a, 1);
 	void* mem = m[0];
 	free(m);
+	return mem;
+}
+
+// size is in bytes
+void* ar_AllocDynamic(DynamicArena *a, int size)
+{
+	void *mem = a->mem+a->offset;
+	a->offset += size;
+	if (a->offset >= a->psize)
+	{
+		if (a->offset >= a->max*GB)
+		{
+			a->offset -= size;
+			printf("Failed to push to stack: Not enough Virtual Memory in the Arena!");
+			return NULL;
+		}
+		VirtualAlloc(mem, size, MEM_COMMIT, PAGE_READWRITE);
+	}
 	return mem;
 }
 

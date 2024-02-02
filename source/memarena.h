@@ -29,6 +29,17 @@ typedef struct
 	MemPosition *skip;		 // Skip memory holder for iteration purposes
 } Arena;
 
+// A dynamic arena has members of any size, but it can only allocate, not deallocate (unless completely freed).  Useful for holding multitudes of different data types, that do not
+// Need to be removed over the course of the game
+typedef struct
+{
+	uint8_t     *mem;        // The 0 index of our memory
+	uint64_t     offset;     // Our current base offset within that memory
+	uint8_t		 max;		 // The max reserved space within our allocator, in GB
+	uint64_t     psize;		 // The actually allocated size of our memory.  If offset is greater than this, we need to expand.
+} DynamicArena;
+
+
 
 
 void  PopMemory(Arena *a, uint64_t size);
@@ -39,6 +50,10 @@ void** ar_ArrayAlloc(Arena *a, int count);
 void ar_Free(Arena *a, void *m);
 void* ar_AllocOneFromArray(Arena *a);
 void* ar_ArenaIterator(Arena *a, int *i);
+
+DynamicArena *CreateDynamicArena(uint8_t size, uint32_t pages);
+void DestroyDynamicArena(DynamicArena *a);
+void* ar_AllocDynamic(DynamicArena *a, int size);
 
 //Some macros to make things a bit simpler
 #define MakeDataArena(type, VirtualGB, pageCount)     CreateArena(sizeof(type), VirtualGB, pageCount)

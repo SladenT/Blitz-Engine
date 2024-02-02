@@ -5,7 +5,7 @@
 ********************************************************************************************/
 #include "camera.h"
 
-bool init = false;
+static bool init = false;
 Camera* mainCam;
 float defaultAspectRatio = 960.0f/540.0f;
 

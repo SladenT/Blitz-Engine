@@ -11,8 +11,11 @@
 #include "structs.h"
 #include "shader.h"
 #include "camera.h"
+#include "entity.h"
 #include <cglm/call.h>
 #include <stdio.h>
+
+#include "stb_image.h"
 
 #define SHADER_GROUP_MAX_COUNT 128
 
@@ -20,8 +23,9 @@ unsigned int SCR_WIDTH = 960;
 unsigned int SCR_HEIGHT = 540;
 
 Shader s;
-Model* m;
 Camera* c;
+
+unsigned int texture;
 
 ShaderGroup shaderGroups[SHADER_GROUP_MAX_COUNT];
 int shaderCount = 0;
@@ -69,7 +73,7 @@ float vertices[] = {
     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, // D
     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, // D
     -0.5f,  0.5f,  0.5f,  0.0f, 0.0f, // H
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f  // G
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f // G
 };
 
 /* float vertices[] = {
@@ -91,7 +95,7 @@ static void error_callback(int error, const char* description)
 
 // #region Forward Declarations
 void r3d_GenerateMeshOne(Model *mod, float vertexData[], int vertAttCount);
-Model* r3d_GenerateModelOne(float vertexData[], int vertAttCount, Shader s);
+Model* r3d_GenerateModelOne(float vertexData[], int vertAttCount, Shader s, uint64_t entID);
 // #endregion
 
 GLFWwindow* r3d_InitWindowRender(void)
@@ -101,8 +105,8 @@ GLFWwindow* r3d_InitWindowRender(void)
         // We busted
         return 0;
     }
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "ShepRTS", NULL, NULL);
     if (!window)
@@ -113,12 +117,14 @@ GLFWwindow* r3d_InitWindowRender(void)
     glfwMakeContextCurrent(window);
     // Setup the function bindings for later versions of openGL using GLAD
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+    // Wireframe mode
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // VSYNC
     glfwSwapInterval(1);
     // Back Face Culling (Counter Clockwise Order)
     glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
-    glFrontFace(GL_CW);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
     // Enable Z-Buffer
     glEnable(GL_DEPTH_TEST);
     // Setup callback
@@ -126,14 +132,38 @@ GLFWwindow* r3d_InitWindowRender(void)
     glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
 
     // Temp for test display
+    //stbi_set_flip_vertically_on_load(true);
+
+	/* glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	// Texture Parameters (wrapping, mipmaps, etc.)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	
+	// Load image into memory
+	int width, height, nrChannels;
+	unsigned char *data = stbi_load("../res/textures/arr0/container.jpg", &width, &height, &nrChannels, 0);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		printf("Image Failed to Load!");
+	}
+	stbi_image_free(data); */
+
     s = sh_BuildShader("def.vs", "def.fs");
-    m = r3d_GenerateModelOne(vertices, 150, s);
-    //r3d_GenerateMeshOne(m, vertices, 150);
+    uint64_t ent = e_CreateEntity();
+    r3d_GenerateModelOne(vertices, 180, s, ent);
     c = cam_GetMainCamera();
     return window;
 }
 
-Model* r3d_GenerateModelOne(float vertexData[], int vertAttCount, Shader s)
+Model* r3d_GenerateModelOne(float vertexData[], int vertAttCount, Shader s, uint64_t entID)
 {
     if (shaderCount == 0)
     {
@@ -149,6 +179,7 @@ Model* r3d_GenerateModelOne(float vertexData[], int vertAttCount, Shader s)
         shaderCount++;
         return m;
     }
+    // TODO: Add in support for more than one mesh being capable of generated
     return NULL;
 }
 
@@ -182,8 +213,24 @@ void r3d_RenderPass(GLFWwindow* window, double deltaTime)
     float gValue = 0.5f;
     float rValue = 1.0f;
     float bValue = 0.5f;
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+    {
+        glmc_translate(c->transform, (vec3){0.0f,0.0f,1.0 * deltaTime});
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+    {
+        glmc_translate(c->transform, (vec3){0.0f,0.0f,-1.0 * deltaTime});
+    }
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+    {
+        glmc_translate(c->transform, (vec3){1.0 * deltaTime,0.0f,0.0f});
+    }
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+    {
+        glmc_translate(c->transform, (vec3){-1.0 * deltaTime,0.0f,0.0f});
+    }
 
-    // TEMPORARY
+    // END TEMPORARY
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT  | GL_DEPTH_BUFFER_BIT);
 
@@ -193,17 +240,20 @@ void r3d_RenderPass(GLFWwindow* window, double deltaTime)
         glUniformMatrix4fv(vertexProjectionLoc, 1, GL_FALSE, (float *)c->projection);
         glUniform4f(vertexColorLocation, rValue, gValue, bValue, 1.0f);
         glUniformMatrix4fv(vertexViewLoc, 1, GL_FALSE, (float *)c->transform);
+        glUniform1i(glGetUniformLocation(s.ID, "texArray"),0);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, 1);
 
         for (int i = 0; i < shaderGroups[i].modelCt; i++)
         {
             Model* model = ar_ArenaIterator(shaderGroups[i].models, &i);
-            glUniformMatrix4fv(vertexTransformLoc, 1, GL_FALSE, (float *)model->transform);
-            glBindVertexArray(m->mesh.VAO);
-            // Need to get the actual vertex count at some point...
+            // TODO: modify transform by parent transforms
+            glUniformMatrix4fv(vertexTransformLoc, 1, GL_FALSE, (float *)e_GetEntityTransform(model->ID));
+            glBindVertexArray(model->mesh.VAO);
+            // TODO: Need to get the actual vertex count at some point, or change to EBO...
             glDrawArrays(GL_TRIANGLES, 0, 36);
             glBindVertexArray(0);
         }
-        
     }
     glfwSwapBuffers(window);
     glfwPollEvents();
