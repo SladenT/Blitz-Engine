@@ -19,10 +19,6 @@
 
 void res_InitImport()
 {
-    GLsizei wid = 2;
-    GLsizei hei = 2;
-    GLsizei layerC = 2;
-    GLsizei mipLevelC = 1;
     // Texture setup
     stbi_set_flip_vertically_on_load(true);
     // For each subfolder within the textures folder, create a texture array
@@ -30,13 +26,13 @@ void res_InitImport()
     glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
     //printf( "glTexStorage3D = %p", glTexStorage3D );
-    glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, 512, 512, 1);
+    glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, 512, 512, 3);
     //glTexStorage3D(GL_TEXTURE_2D_ARRAY, mipLevelC, GL_RGBA8, wid, hei, layerC);
 	// Texture Parameters (wrapping, mipmaps, etc.)
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
    /*  glBindTexture(GL_TEXTURE_2D, texture);
 	// Texture Parameters (wrapping, mipmaps, etc.)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -65,12 +61,12 @@ void res_InitImport()
             strncat(imbuffer, "/", 259);
             strncat(imbuffer, texdir->d_name, 259);
             int width, height, nrChannels;
-	        unsigned char *data = stbi_load(imbuffer, &width, &height, &nrChannels, 0);
+	        unsigned char *data = stbi_load(imbuffer, &width, &height, &nrChannels, 4);
             if (data)
             {
                 //glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
                 //glGenerateMipmap(GL_TEXTURE_2D);
-                glTexSubImage3D(GL_TEXTURE_2D_ARRAY,0,0,0,0,width,height,1,GL_RGB,GL_UNSIGNED_BYTE,data);
+                glTexSubImage3D(GL_TEXTURE_2D_ARRAY,0,0,0,count,width,height,1,GL_RGBA,GL_UNSIGNED_BYTE,data);
                 //glTexImage3D(GL_TEXTURE_2D_ARRAY,0,GL_RGB,width,height,count,0, GL_RGB, GL_UNSIGNED_BYTE, data);
                 //glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
                 //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);

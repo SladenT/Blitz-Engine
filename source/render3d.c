@@ -95,7 +95,7 @@ static void error_callback(int error, const char* description)
 
 // #region Forward Declarations
 void r3d_GenerateMeshOne(Model *mod, float vertexData[], int vertAttCount);
-Model* r3d_GenerateModelOne(float vertexData[], int vertAttCount, Shader s, uint64_t entID);
+Model* r3d_GenerateModelOne(float vertexData[], int vertAttCount, Shader s, uint64_t entID, uint32_t matID);
 // #endregion
 
 GLFWwindow* r3d_InitWindowRender(void)
@@ -132,38 +132,14 @@ GLFWwindow* r3d_InitWindowRender(void)
     glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
 
     // Temp for test display
-    //stbi_set_flip_vertically_on_load(true);
-
-	/* glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	// Texture Parameters (wrapping, mipmaps, etc.)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	
-	// Load image into memory
-	int width, height, nrChannels;
-	unsigned char *data = stbi_load("../res/textures/arr0/container.jpg", &width, &height, &nrChannels, 0);
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		printf("Image Failed to Load!");
-	}
-	stbi_image_free(data); */
-
     s = sh_BuildShader("def.vs", "def.fs");
     uint64_t ent = e_CreateEntity();
-    r3d_GenerateModelOne(vertices, 180, s, ent);
+    r3d_GenerateModelOne(vertices, 180, s, ent, mat_CreateDefaultMaterial(0, ent, false));
     c = cam_GetMainCamera();
     return window;
 }
 
-Model* r3d_GenerateModelOne(float vertexData[], int vertAttCount, Shader s, uint64_t entID)
+Model* r3d_GenerateModelOne(float vertexData[], int vertAttCount, Shader s, uint64_t entID, uint32_t matID)
 {
     if (shaderCount == 0)
     {
@@ -177,6 +153,7 @@ Model* r3d_GenerateModelOne(float vertexData[], int vertAttCount, Shader s, uint
         glmc_mat4_identity(m->transform);
         glmc_mat4_quat(m->transform, q);
         shaderCount++;
+        m->mat = matID;
         return m;
     }
     // TODO: Add in support for more than one mesh being capable of generated
@@ -250,6 +227,8 @@ void r3d_RenderPass(GLFWwindow* window, double deltaTime)
             // TODO: modify transform by parent transforms
             glUniformMatrix4fv(vertexTransformLoc, 1, GL_FALSE, (float *)e_GetEntityTransform(model->ID));
             glBindVertexArray(model->mesh.VAO);
+            // TODO: Process materials for the model per shader
+            mat_SetShaderFromMaterial(mat_GetMatFromID(model->mat), shaderGroups[i].s);
             // TODO: Need to get the actual vertex count at some point, or change to EBO...
             glDrawArrays(GL_TRIANGLES, 0, 36);
             glBindVertexArray(0);

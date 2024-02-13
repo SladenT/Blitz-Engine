@@ -6,6 +6,7 @@
 ********************************************************************************************/
 #include "material.h"
 #include "memarena.h"
+#include "shader.h"
 #include <string.h>
 DynamicArena* matArena;
 void*  idLocs[1048576];  //Index is the entity ID, which contains a memory value that points to our material
@@ -40,4 +41,24 @@ int mat_CreateDefaultMaterial(int texID, int entityID, bool isUnique)
     matIDCounter++;
     idLocs[entityID] = m;
     return m->ID;
+}
+
+Material* mat_GetMatFromID(int ID)
+{
+    Material* mat = (Material*)idLocs[ID];
+    return (Material*)idLocs[ID];
+}
+
+// TODO: Support for more data types
+void mat_SetShaderFromMaterial(Material *mat, Shader s)
+{
+    MatAtt *curMemOffset = mat->matAttributes;
+    for (int i = 0; i < mat->count; i++)
+    {
+        if (curMemOffset->type & ut_Integer != 0)
+        {
+            sh_SetInt(curMemOffset->uniformName, s, *(int*)curMemOffset->data);
+        }
+        curMemOffset += curMemOffset->size;
+    }
 }

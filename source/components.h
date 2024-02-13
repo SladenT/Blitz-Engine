@@ -22,7 +22,7 @@ typedef struct __attribute__((__packed__)) // 88 Bytes (it doesn't properly pack
 	mat4 	  transform;	// Deprecated - might change this to offset
 	Mesh 	  mesh;
 	uint64_t  ID;		 	// Entity ID
-	uint32_t  buff;			// Useless, but without we wouldn't be byte aligned with packing, and removing it and packing bumps us up to 96 bytes, instead of 88.
+	uint32_t  mat;			// Material ID
 } Model;
 
 // #endregion

@@ -7,7 +7,7 @@
 
 static bool init = false;
 Camera* mainCam;
-float defaultAspectRatio = 960.0f/540.0f;
+float defaultAspectRatio = 1920.0f/1080.0f;
 
 static void InitializeMainCamera(float aspectRatio);
 
