@@ -4,9 +4,9 @@
 *
 *   Created by Davis Teigeler
 ********************************************************************************************/
-#include "stb_image.h"
 #include "resimport.h"
 #include "components.h"
+#include <stb_image.h>
 #include <glad/glad.h>
 #include <dirent.h>
 
