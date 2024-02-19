@@ -29,6 +29,23 @@ typedef struct
 //} End Shader Definitions 
 //-----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
+//{ Mesh Data Definitions 
+//-----------------------------------------------------------------------------
+
+typedef struct MeshData
+{
+	float 	*vertices;			// Contains position, TexCoordinates, Normals, etc
+	uint32_t vertCount;
+	uint32_t *indices;			// Index Order for the EBO
+	uint32_t indexCount;
+} MeshData;
+
+
+//-----------------------------------------------------------------------------
+//} End Mesh Data Definitions 
+//-----------------------------------------------------------------------------
+
 
 
 

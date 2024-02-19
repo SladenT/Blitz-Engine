@@ -17,12 +17,13 @@ typedef struct
 	uint32_t EBO;  //Element Buffer Object (Index Order for Tris)
 } Mesh;
 
-typedef struct __attribute__((__packed__)) // 88 Bytes (it doesn't properly pack mesh otherwise)
+typedef struct __attribute__((__packed__)) // 96 Bytes (it doesn't properly pack mesh otherwise)
 {
 	mat4 	  transform;	// Deprecated - might change this to offset
 	Mesh 	  mesh;
 	uint64_t  ID;		 	// Entity ID
 	uint32_t  mat;			// Material ID
+	uint64_t  vertexCount;
 } Model;
 
 // #endregion
