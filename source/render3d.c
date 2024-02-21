@@ -9,6 +9,7 @@
 #include "render3d.h"
 #include "camera.h"
 #include "entity.h"
+#include "material.h"
 #include <cglm/call.h>
 #include <stdio.h>
 #include "stb_image.h"
@@ -27,13 +28,6 @@ ShaderGroup shaderGroups[SHADER_GROUP_MAX_COUNT];
 int shaderCount = 0;
 
 // Test box
-
-
-/* float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
-};   */
 
 static float vertices[] = {
 	
@@ -152,9 +146,29 @@ Model* r3d_GenerateModelOne(float vertexData[], int vertAttCount, int indexData[
         glmc_mat4_quat(m->transform, q);
         shaderCount++;
         m->mat = matID;
+        m->ID = entID;
         return m;
     }
-    // TODO: Add in support for more than one mesh being capable of generated
+    else 
+    {
+        for (int i = 0; i < shaderCount; i++)
+        {
+            if (s.ID == shaderGroups[i].s.ID)
+            {
+                shaderGroups[i].modelCt++;
+                Model *m = ar_AllocOne(shaderGroups[0].models);
+                r3d_GenerateMeshOne(m, vertexData, vertAttCount, indexData, indexCount);
+                versor q;
+                glmc_mat4_identity(m->transform);
+                glmc_mat4_quat(m->transform, q);
+                shaderCount++;
+                m->mat = matID;
+                m->ID = entID;
+                return m;
+            }
+        }
+    }
+    // TODO: Add in support for adding more shaders to the shaderGroup Array;
     return NULL;
 }
 
@@ -234,9 +248,9 @@ void r3d_RenderPass(GLFWwindow* window, double deltaTime)
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D_ARRAY, 1);
 
-        for (int i = 0; i < shaderGroups[i].modelCt; i++)
+        for (int j = 0; j < shaderGroups[i].modelCt; j++)
         {
-            Model* model = ar_ArenaIterator(shaderGroups[i].models, &i);
+            Model* model = ar_ArenaIterator(shaderGroups[i].models, &j);
             // TODO: modify transform by parent transforms
             glUniformMatrix4fv(vertexTransformLoc, 1, GL_FALSE, (float *)e_GetEntityTransform(model->ID));
             glBindVertexArray(model->mesh.VAO);

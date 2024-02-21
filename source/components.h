@@ -62,6 +62,8 @@ typedef struct Material
 
 // An entity is the base for any 3D object in the scene.  Using the identifier, we can transpose various components onto the Entity.
 // Parent entities offset the transform of child entities
+
+// TODO: Scale, Rotation and Translation vectors (so as to normalize transformations)?  Think it over
 typedef struct Entity
 {
 	uint64_t ID;		// might not need ID

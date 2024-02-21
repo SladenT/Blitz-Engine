@@ -120,7 +120,12 @@ char* ReadFromFile(const char* filename)
 	int i = 0;
 	while (!feof(f))
 	{
-		s[i] = getc(f);
+		char c = getc(f);
+		if (c == -1)
+		{
+			c = '\0';
+		}
+		s[i] = c;
 		i++;
 	}
 	return s;
