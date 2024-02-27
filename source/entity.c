@@ -20,9 +20,15 @@ void e_InitEntities()
 uint64_t e_CreateEntity()
 {
     Entity* e =  ar_AllocOne(entityArena);
-    versor q;
+    /* versor q;
     glmc_mat4_identity(e->transform);
-    glmc_mat4_quat(e->transform, q);
+    glmc_mat4_quat(e->transform, q); */
+    /* e->position = {0,0,0};
+    e->rotation = {0,0,0};
+    e->scale = {0,0,0}; */
+    glmc_vec3_one(e->position);
+    glmc_vec3_zero(e->rotation);
+    glmc_vec3_one(e->scale);
     e->ID = IDCounter;
     e->parent = UINT64_MAX;
     IDCounter++;
@@ -42,5 +48,35 @@ int e_CreateEntityWithParent(uint64_t parentID)
 mat4* e_GetEntityTransform(uint64_t id)
 {
     Entity* en = (Entity*)idArr[id];
+    versor q;
+    glmc_mat4_identity(en->transform);
+    glmc_mat4_quat(en->transform, q);
+    glmc_translate(en->transform, en->position);
+    glmc_rotate_x(en->transform, en->rotation[0], en->transform);
+    glmc_rotate_y(en->transform, en->rotation[1], en->transform);
+    glmc_rotate_z(en->transform, en->rotation[2], en->transform);
+    glmc_scale(en->transform, en->scale);
     return en->transform;
+}
+
+void e_SetEnitityPosition(uint64_t id, vec3 pos)
+{
+    Entity* en = (Entity*)idArr[id];
+    en->position[0] = pos[0];
+    en->position[1] = pos[1];
+    en->position[2] = pos[2];
+}
+void e_SetEnitityRotation(uint64_t id, vec3 rot)
+{
+    Entity* en = (Entity*)idArr[id];
+    en->rotation[0] = rot[0];
+    en->rotation[1] = rot[1];
+    en->rotation[2] = rot[2];
+}
+void e_SetEnitityScale(uint64_t id, vec3 scale)
+{
+    Entity* en = (Entity*)idArr[id];
+    en->scale[0] = scale[0];
+    en->scale[1] = scale[1];
+    en->scale[2] = scale[2];
 }

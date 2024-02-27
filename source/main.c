@@ -27,7 +27,7 @@ int main(void)
     Shader s = sh_BuildShader("def.vs", "def.fs");
     uint64_t ent = e_CreateEntity();
     Model *m = r3d_GenerateFromMeshData(bush, s, ent, mat_CreateDefaultMaterial(2, ent, false));
-    glm_scale(e_GetEntityTransform(ent), scale);
+    e_SetEnitityScale(ent, scale);
     m->vertexCount = bush.indexCount;
 
     uint64_t ent2 = e_CreateEntity();
@@ -39,11 +39,11 @@ int main(void)
     m3->vertexCount = bush.indexCount;
 
 
-    glmc_translate(e_GetEntityTransform(ent2), (vec3){7.0f,0.0f,-5.0f});
-    glm_scale(e_GetEntityTransform(ent2), scale);
+    e_SetEnitityScale(ent2, scale);
+    e_SetEnitityPosition(ent2, (vec3){7.0f,0.0f,-5.0f});
 
-    glmc_translate(e_GetEntityTransform(ent3), (vec3){-3.0f,0.0f,-5.0f});
-    glm_scale(e_GetEntityTransform(ent3), scale);
+   e_SetEnitityPosition(ent3, (vec3){-3.0f,0.0f,-5.0f});
+   e_SetEnitityScale(ent3, scale);
 
 
     lastTime = glfwGetTime();

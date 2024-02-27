@@ -68,6 +68,9 @@ typedef struct Entity
 {
 	uint64_t ID;		// might not need ID
 	mat4 transform;
+	vec3 position;
+	vec3 scale;
+	vec3 rotation;
 	uint64_t parent;
 } Entity;
 
