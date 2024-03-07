@@ -42,8 +42,8 @@ int main(void)
     e_SetEnitityScale(ent2, scale);
     e_SetEnitityPosition(ent2, (vec3){7.0f,0.0f,-5.0f});
 
-   e_SetEnitityPosition(ent3, (vec3){-3.0f,0.0f,-5.0f});
-   e_SetEnitityScale(ent3, scale);
+    e_SetEnitityPosition(ent3, (vec3){-3.0f,0.0f,-5.0f});
+    e_SetEnitityScale(ent3, scale);
 
 
     lastTime = glfwGetTime();

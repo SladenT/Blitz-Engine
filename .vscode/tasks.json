@@ -16,6 +16,7 @@
                 "${fileDirname}\\..\\lib",
                 "-lassimp-vc142-mtd",
                 "-lcglm",
+                "-lgladlib",
                 "-lglfw3",
                 "-lstbilib",
                 "-lopengl32",
