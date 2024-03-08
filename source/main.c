@@ -19,6 +19,9 @@ int main(void)
 {
     e_InitEntities();
     GLFWwindow* window = r3d_InitWindowRender();
+
+    gui_Start();
+
     res_InitImport();
     MeshData bush = res_ImportMesh("../res/meshes/bush_01.obj");
     
