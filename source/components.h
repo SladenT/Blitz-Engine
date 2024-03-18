@@ -84,11 +84,41 @@ typedef struct Entity
 
 //#endregion
 
+//#region Collider
+
+typedef enum ColliderType
+{
+	cl_AABB 		= 0x00000001
+} ColliderType;
+
+typedef struct ColliderContainer
+{
+	uint32_t colliderType;
+	void* 	 mem; 
+} ColliderContainer;
+
+typedef struct Rect3D
+{
+	float x;    // Origin vectors
+	float y;
+	float z;
+	float w;	// Dimension vectors
+	float d;
+	float h;
+} Rect3D;
 
 
 
 
 
+
+
+
+
+
+
+
+//#endregion
 
 
 

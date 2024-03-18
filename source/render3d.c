@@ -174,7 +174,7 @@ Model* r3d_GenerateModelOne(float vertexData[], int vertAttCount, int indexData[
 
 Model* r3d_GenerateFromMeshData(MeshData data, Shader s, uint64_t entID, uint32_t matID)
 {
-    return r3d_GenerateModelOne(data.vertices, data.vertCount, data.indices, data.indexCount, s, entID, matID);
+    return r3d_GenerateModelOne(data.vertices, data.vertCount*5, data.indices, data.indexCount, s, entID, matID);
 }
 
 void r3d_GenerateMeshOne(Model *mod, float vertexData[], int vertAttCount,  int indexData[], int indexCount)
@@ -189,7 +189,7 @@ void r3d_GenerateMeshOne(Model *mod, float vertexData[], int vertAttCount,  int 
     glBindBuffer(GL_ARRAY_BUFFER, mod->mesh.VBO);
     glBufferData(GL_ARRAY_BUFFER, vertAttCount*sizeof(float), vertexData, GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mod->mesh.EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount, indexData, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount*sizeof(int), indexData, GL_STATIC_DRAW);
 
     //Verts
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
