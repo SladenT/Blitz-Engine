@@ -53,10 +53,10 @@ int main(void)
     lastTime = glfwGetTime();
     while (!glfwWindowShouldClose(window))
 	{
-        gui_Render();
         double deltaTime = glfwGetTime() - lastTime;
         lastTime = glfwGetTime();
         r3d_RenderPass(window, deltaTime);
+        gui_Render();
     }
     glfwTerminate();
 	return 0;

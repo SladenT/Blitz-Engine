@@ -262,6 +262,6 @@ void r3d_RenderPass(GLFWwindow* window, double deltaTime)
             glBindVertexArray(0);
         }
     }
-    glfwSwapBuffers(window);
+    //glfwSwapBuffers(window);
     glfwPollEvents();
 }
