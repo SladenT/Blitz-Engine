@@ -202,9 +202,10 @@ void r3d_GenerateMeshOne(Model *mod, float vertexData[], int vertAttCount,  int 
 
 void r3d_RenderPass(GLFWwindow* window, double deltaTime)
 {
-    // TEMPORARY
     
-
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    // TEMPORARY
     float gValue = 0.5f;
     float rValue = 0.5f;
     float bValue = 0.5f;

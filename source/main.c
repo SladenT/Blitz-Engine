@@ -34,20 +34,20 @@ int main(void)
     e_SetEnitityScale(ent, scale);
     m->vertexCount = bush.indexCount;
 
-    /* uint64_t ent2 = e_CreateEntity();
-    Model *m2 = r3d_GenerateFromMeshData(bush, s, ent2, mat_CreateDefaultMaterial(1, ent2, false));
+    uint64_t ent2 = e_CreateEntity();
+    Model *m2 = r3d_GenerateFromMeshData(bush, s, ent2, mat_CreateDefaultMaterial(2, ent2, false));
     m2->vertexCount = bush.indexCount;
 
     uint64_t ent3 = e_CreateEntity();
-    Model *m3 = r3d_GenerateFromMeshData(bush, s, ent3, mat_CreateDefaultMaterial(1, ent3, false));
-    m3->vertexCount = bush.indexCount; */
+    Model *m3 = r3d_GenerateFromMeshData(bush, s, ent3, mat_CreateDefaultMaterial(2, ent3, false));
+    m3->vertexCount = bush.indexCount;
 
 
-    /* e_SetEnitityScale(ent2, scale);
+    e_SetEnitityScale(ent2, scale);
     e_SetEnitityPosition(ent2, (vec3){7.0f,3.0f,-5.0f});
 
     e_SetEnitityPosition(ent3, (vec3){-3.0f,0.0f,-5.0f});
-    e_SetEnitityScale(ent3, scale); */
+    e_SetEnitityScale(ent3, scale);
 
 
     lastTime = glfwGetTime();
