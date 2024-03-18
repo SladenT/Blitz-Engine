@@ -20,7 +20,7 @@ int main(void)
     e_InitEntities();
     GLFWwindow* window = r3d_InitWindowRender();
 
-    gui_Start();
+    gui_Init(window);
 
     res_InitImport();
     MeshData bush = res_ImportMesh("../res/meshes/bush_01.obj");
@@ -52,6 +52,7 @@ int main(void)
     lastTime = glfwGetTime();
     while (!glfwWindowShouldClose(window))
 	{
+        gui_Render();
         double deltaTime = glfwGetTime() - lastTime;
         lastTime = glfwGetTime();
         r3d_RenderPass(window, deltaTime);
