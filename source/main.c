@@ -19,6 +19,7 @@ int main(void)
 {
     e_InitEntities();
     GLFWwindow* window = r3d_InitWindowRender();
+    res_InitImport();
 
     gui_Init(window);
 
