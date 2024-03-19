@@ -174,7 +174,7 @@ Model* r3d_GenerateModelOne(float vertexData[], int vertAttCount, int indexData[
 
 Model* r3d_GenerateFromMeshData(MeshData data, Shader s, uint64_t entID, uint32_t matID)
 {
-    return r3d_GenerateModelOne(data.vertices, data.vertCount*5, data.indices, data.indexCount, s, entID, matID);
+    return r3d_GenerateModelOne(data.vertices, data.vertCount*8, data.indices, data.indexCount, s, entID, matID);
 }
 
 void r3d_GenerateMeshOne(Model *mod, float vertexData[], int vertAttCount,  int indexData[], int indexCount)
@@ -192,11 +192,14 @@ void r3d_GenerateMeshOne(Model *mod, float vertexData[], int vertAttCount,  int 
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount*sizeof(int), indexData, GL_STATIC_DRAW);
 
     //Verts
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     //UV Coordinates
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3*sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3*sizeof(float)));
     glEnableVertexAttribArray(1);
+    //Vertex Normals
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5*sizeof(float)));
+    glEnableVertexAttribArray(2);
     glBindVertexArray(0);
 }
 
@@ -241,11 +244,17 @@ void r3d_RenderPass(GLFWwindow* window, double deltaTime)
         int vertexTransformLoc = glGetUniformLocation(shaderGroups[i].s.ID, "transform");
         int vertexViewLoc = glGetUniformLocation(shaderGroups[i].s.ID, "view");
         int vertexProjectionLoc = glGetUniformLocation(shaderGroups[i].s.ID, "proj");
+        int cameeraPosLoc = glGetUniformLocation(shaderGroups[i].s.ID, "viewPos");
 
         glUniformMatrix4fv(vertexProjectionLoc, 1, GL_FALSE, (float *)c->projection);
         glUniform4f(vertexColorLocation, rValue, gValue, bValue, 1.0f);
         glUniformMatrix4fv(vertexViewLoc, 1, GL_FALSE, (float *)c->transform);
         glUniform1i(glGetUniformLocation(shaderGroups[i].s.ID, "texArray"),0);
+
+        vec3 outPos;
+        cam_GetCamPosition(*c, outPos);
+        glUniform3f(cameeraPosLoc, outPos[0], outPos[1], outPos[2]);
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D_ARRAY, 1);
 
@@ -264,5 +273,4 @@ void r3d_RenderPass(GLFWwindow* window, double deltaTime)
         }
     }
     //glfwSwapBuffers(window);
-    glfwPollEvents();
 }

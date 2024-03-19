@@ -12,6 +12,7 @@ typedef struct
 
 
 Camera* cam_GetMainCamera(void);
+void cam_GetCamPosition(Camera cam, vec3 outPos);
 
 
 

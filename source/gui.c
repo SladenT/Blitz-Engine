@@ -45,7 +45,7 @@ void gui_Render()
             
             }
     nk_end(ctx);
-
+    
     nk_glfw3_render(&glfw, NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER, MAX_ELEMENT_BUFFER);
     glfwSwapBuffers(win);
 }

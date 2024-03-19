@@ -112,10 +112,10 @@ MeshData res_ImportMesh(const char *pFile)
     }
     //struct aiNode *node = scene->mRootNode;
     struct aiMesh* mesh = scene->mMeshes[0];
-    float *mData = malloc((sizeof(float)*5)*mesh->mNumVertices);
+    float *mData = malloc((sizeof(float)*8)*mesh->mNumVertices);
     for(unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
-        int index = i*5;
+        int index = i*8;
         // Verts
         mData[index] = mesh->mVertices[i].x;
         mData[index+1] = mesh->mVertices[i].y;
@@ -123,6 +123,10 @@ MeshData res_ImportMesh(const char *pFile)
         // TexCoords
         mData[index+3] = mesh->mTextureCoords[0][i].x;
         mData[index+4] = mesh->mTextureCoords[0][i].y;
+        // Vertex Normals
+        mData[index+5] = mesh->mNormals[i].x;
+        mData[index+6] = mesh->mNormals[i].y;
+        mData[index+7] = mesh->mNormals[i].z;
     }
     int *indexOrder = malloc(sizeof(int)*(mesh->mNumFaces * 3));
     md.indexCount = 0;

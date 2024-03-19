@@ -6,6 +6,7 @@
 #include "entity.h"
 #include "memarena.h"
 #include "components.h"
+#include "math.h"
 
 Arena* entityArena;
 int64_t idArr[1048576]; // 8MB of memory, max 1 million entities, for now.  I really doubt we'll get above that
@@ -13,7 +14,7 @@ uint64_t IDCounter = 0;
 
 void e_InitEntities()
 {
-    entityArena = MakeDataArena(Entity, 1, 4);
+    entityArena = MakeDataArena(Entity, 1, 8);
 }
 
 // TODO: Add check for deleted entities (will also make deleted entity ID linked list at some point)
@@ -79,4 +80,29 @@ void e_SetEnitityScale(uint64_t id, vec3 scale)
     en->scale[0] = scale[0];
     en->scale[1] = scale[1];
     en->scale[2] = scale[2];
+}
+
+// angle in radians
+void e_OrbitAroundEntity(uint64_t id1, uint64_t id2, float angle, float radius)
+{
+    Entity* en = (Entity*)idArr[id1];
+    Entity* en2 = (Entity*)idArr[id2];
+    float x = cos(angle);
+    float y = sin(angle);
+    x = x*radius;
+    y = y*radius;
+
+    en->position[0] = en2->position[0]+x;
+    en->position[2] = en2->position[2]+y;
+}
+
+// angle in radians
+// technically I think the axis multiplication is incorrect, but it'll wok for pure axis which is all I care about atm
+// TODO: Fix axis mult
+void e_RotateBy(uint64_t id, float angle, vec3 axis)
+{
+    Entity* en = (Entity*)idArr[id];
+    en->rotation[0] = (en->rotation[0]+angle) * axis[0];
+    en->rotation[1] = (en->rotation[1]+angle) * axis[1];
+    en->rotation[2] = (en->rotation[2]+angle) * axis[2];
 }

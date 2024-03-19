@@ -21,6 +21,15 @@ Camera* cam_GetMainCamera(void)
     return mainCam;
 }
 
+void cam_GetCamPosition(Camera cam, vec3 outPos)
+{
+    vec4 pos;
+    mat4 r;
+    vec3 s;
+    glmc_decompose(cam.transform, pos, r, s);
+    outPos = (vec3){pos[0],pos[1],pos[2]};
+}
+
 static void InitializeMainCamera(float aspectRatio)
 {
     mainCam = malloc(sizeof(Camera));

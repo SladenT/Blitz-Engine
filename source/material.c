@@ -39,7 +39,7 @@ int mat_CreateDefaultMaterial(int texID, int entityID, bool isUnique)
     m->matAttributes->size = 144;
     *(int*)m->matAttributes->data = texID;
     matIDCounter++;
-    idLocs[entityID] = m;
+    idLocs[m->ID] = m;
     return m->ID;
 }
 
