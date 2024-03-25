@@ -10,6 +10,7 @@
 #include "entity.h"
 #include "resimport.h"
 #include "shader.h"
+#include "physics.h"
 #include "structs.h"
 #include "camera.h"
 #include <stb_image.h>
@@ -23,6 +24,7 @@ int main(void)
     GLFWwindow* window = r3d_InitWindowRender();
     res_InitImport();
     gui_Init(window);
+    p_PhysicsInit();
 
     Camera *c = cam_GetMainCamera();
     glmc_translate(c->transform, (vec3){0.0f,-3.0,-4.0f});
@@ -38,6 +40,7 @@ int main(void)
     uint64_t ent2 = e_CreateEntity();
     //e_SetEnitityScale(ent2, (vec3) {0.03,0.03,0.03});
     e_SetEnitityPosition(ent2, (vec3) {-5.0,0,0});
+    p_MakePhysicBody(ent2, false);
 
     uint64_t ent3 = e_CreateEntity();
     e_SetEnitityScale(ent3, (vec3) {0.03,0.03,0.03});
@@ -57,6 +60,7 @@ int main(void)
 	{
         double deltaTime = glfwGetTime() - lastTime;
         lastTime = glfwGetTime();
+        p_PhysicsUpdate(deltaTime);
         r3d_RenderPass(window, deltaTime);
 		gui_Render();
         glfwPollEvents();

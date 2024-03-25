@@ -9,8 +9,8 @@
 #include "math.h"
 
 Arena* entityArena;
-int64_t idArr[1048576]; // 8MB of memory, max 1 million entities, for now.  I really doubt we'll get above that
-uint64_t IDCounter = 0;
+static int64_t idArr[1048576]; // 8MB of memory, max 1 million entities, for now.  I really doubt we'll get above that
+static uint64_t IDCounter = 0;
 
 void e_InitEntities()
 {
@@ -105,4 +105,9 @@ void e_RotateBy(uint64_t id, float angle, vec3 axis)
     en->rotation[0] = (en->rotation[0]+angle) * axis[0];
     en->rotation[1] = (en->rotation[1]+angle) * axis[1];
     en->rotation[2] = (en->rotation[2]+angle) * axis[2];
+}
+
+Entity* e_GetEntity(uint64_t id)
+{
+    return (Entity*)idArr[id];
 }

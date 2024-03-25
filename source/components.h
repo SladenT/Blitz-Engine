@@ -88,12 +88,14 @@ typedef struct Entity
 
 typedef enum ColliderType
 {
-	cl_AABB 		= 0x00000001
+	cl_NONE 		= 0x00000001,
+	cl_AABB 		= 0x00000002
 } ColliderType;
 
 typedef struct ColliderContainer
 {
 	uint32_t colliderType;
+	vec3 	 offset;
 	void* 	 mem; 
 } ColliderContainer;
 
@@ -107,19 +109,26 @@ typedef struct Rect3D
 	float h;
 } Rect3D;
 
+//#endregion
 
-
-
-
-
-
-
-
-
+//#region Physics
+typedef struct PhysicBody
+{
+	uint64_t 		  entity;
+	bool 	 		  stat;				// A static physic body is not updated by physics calculations, and is not moved by other physics forces (such as collisions), but
+										// still interacts with other physics bodys e.g. a static landmass
+	ColliderContainer col;
+	float 	 		  mass;
+	float			  friction;
+	float 			  bounce;
+	vec3 	 		  offset;			// This dictates the center of mass, away from entity origin - it does not change the position of the collider.
+	vec3 	 		  velocity;
+	vec3 	 		  accel;			// Typically, this should only be modified for constant acceleration, such as gravity.  More dynamic forms (such as air resistance)
+										// should be custom coded To modify velocity instead
+} PhysicBody;
 
 
 //#endregion
-
 
 
 
