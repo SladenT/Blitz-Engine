@@ -32,15 +32,27 @@ void gui_Init(GLFWwindow* window)
 
     nk_glfw3_font_stash_begin(&glfw, &atlas);
     nk_glfw3_font_stash_end(&glfw);
+
+    
 }
 
 void gui_Render()
 {
+        // GUI
+    //if (nk_begin(ctx, "GUI Version 1", nk_rect(50, 50, 230, 250), NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE))
     glfwPollEvents();
     nk_glfw3_new_frame(&glfw);
 
-        // GUI
-    if (nk_begin(ctx, "GUI Version 1", nk_rect(50, 50, 230, 250), NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE))
+    gui_admin();
+    gui_settings();
+    
+    nk_glfw3_render(&glfw, NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER, MAX_ELEMENT_BUFFER);
+    glfwSwapBuffers(win);
+}
+
+void gui_admin()
+{
+    if (nk_begin(ctx, "GUI Version 1", nk_rect(0, 0, 230, 250), NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE))
         {
             enum {EASY, HARD};
             static int op = EASY;
@@ -58,8 +70,24 @@ void gui_Render()
             
             }
     nk_end(ctx);
-    
-    nk_glfw3_render(&glfw, NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER, MAX_ELEMENT_BUFFER);
-    glfwSwapBuffers(win);
 }
 
+void gui_settings()
+{
+    
+    if (nk_begin(ctx, "Settings", nk_rect(730, 5, 225, 100), NK_WINDOW_BORDER|NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE|NK_WINDOW_MOVABLE))
+        {
+            static float value = 0.6f;
+
+            nk_layout_row_begin(ctx, NK_STATIC, 30, 2);
+                {
+                    nk_layout_row_push(ctx, 50);
+                    nk_label(ctx, "Volume:", NK_TEXT_LEFT);
+                    nk_layout_row_push(ctx, 110);
+                    nk_slider_float(ctx, 0, &value, 1.0f, 0.1f);
+                 }
+            nk_layout_row_end(ctx);
+
+        }
+    nk_end(ctx);
+}
