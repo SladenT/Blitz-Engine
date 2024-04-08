@@ -20,14 +20,15 @@
 #define TEX_FOLDER "/res/textures/"
 #endif
 
+unsigned int texArray0;
+
 void res_InitImport()
 {
     // Texture setup
     stbi_set_flip_vertically_on_load(true);
     // For each subfolder within the textures folder, create a texture array
-    unsigned int texture;
-    glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
+    glGenTextures(1, &texArray0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, texArray0);
     //printf( "glTexStorage3D = %p", glTexStorage3D );
     glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, 512, 512, 256);
     //glTexStorage3D(GL_TEXTURE_2D_ARRAY, mipLevelC, GL_RGBA8, wid, hei, layerC);
@@ -96,6 +97,11 @@ void res_InitImport()
 	}
 	stbi_image_free(data); */
 
+}
+
+unsigned int res_GetTexArray0()
+{
+    return texArray0;
 }
 
 MeshData res_ImportMesh(const char *pFile)

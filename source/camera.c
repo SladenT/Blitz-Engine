@@ -23,34 +23,52 @@ Camera* cam_GetMainCamera(void)
 
 void cam_GetCamPosition(Camera cam, vec3 outPos)
 {
-    vec4 pos;
-    mat4 r;
-    vec3 s;
-    glmc_decompose(cam.transform, pos, r, s);
-    outPos = (vec3){pos[0],pos[1],pos[2]};
+    outPos[0] = cam.position[0];
+    outPos[1] = cam.position[1];
+    outPos[2] = cam.position[2];
+}
+
+void cam_GetCamTransform(Camera cam, mat4 view)
+{
+    vec3 cameraUp = {0.0f, 1.0f,  0.0f};
+    glmc_mat4_identity(view);
+    vec3 c;
+    glmc_vec3_add(cam.position, cam.rotation, c);
+    glmc_lookat(cam.position, c, cameraUp, view);
+}
+
+void cam_TranslateCameraBy(Camera *cam, vec3 pos)
+{
+    cam->position[0] += pos[0];
+    cam->position[1] += pos[1];
+    cam->position[2] += pos[2];
 }
 
 static void InitializeMainCamera(float aspectRatio)
 {
     mainCam = malloc(sizeof(Camera));
     // Initial View
-    mat4 view;
+    /* mat4 view;
 	glmc_mat4_identity(view);
     vec3 cameraPos   = {0.0f, 2.0f,  3.0f};
 	vec3 cameraFront = {0.0f, -0.5f,  -1.0f};
 	vec3 cameraUp    = {0.0f, 1.0f,  0.0f};
     vec3 c;
 	glmc_vec3_add(cameraPos, cameraFront, c);
-	glmc_lookat(cameraPos, c, cameraUp, view);
+	glmc_lookat(cameraPos, c, cameraUp, view); */
 	
-    // Default to 45 degree downward view
 	mat4 projection;
 	glmc_mat4_identity(projection);
 	glmc_perspective(glm_rad(45.0f), aspectRatio, 0.1f, 10000.0f, projection);
-
     
-    glmc_mat4_copy(view, *mainCam->transform);
+    //glmc_mat4_copy(view, mainCam->transform);
     glmc_mat4_copy(projection, mainCam->projection);
     mainCam->aspectRatio = aspectRatio;
+    mainCam->position[0] = 0.0f;
+    mainCam->position[1] = 2.0f;
+    mainCam->position[2] = 3.0f;
+    mainCam->rotation[0] = 0.0f;
+    mainCam->rotation[1] = -0.5f;
+    mainCam->rotation[2] = -1.0f;
 }
 

@@ -17,6 +17,14 @@
 
 void *PushMemory(Arena *a, uint64_t size);
 
+/* 
+   Chunk is the physical size of each logical unit within the arena (for example, if we were creating a
+   FOO arena, made out of FOO structs, and each FOO is 32 bytes, chunk should be 32)
+
+   Size is the amount of virtual memory to be allocated
+
+   Pages is the amount of *physical* memory to be allocated at the time.  This can increase later as needs demand 
+*/
 Arena *CreateArena(uint64_t chunk, uint8_t size, uint32_t pages)
 {
 	if (pages*PAGE > size*GB)

@@ -28,6 +28,7 @@ PhysicBody* p_MakePhysicBody(uint64_t entityID, bool statec)
     pb->offset[0] = 0;
     pb->offset[1] = 0;
     pb->offset[2] = 0;
+    pb->col.colliderType = cl_NONE;
 
     pb->velocity[0] = 0;
     pb->velocity[1] = 0;
@@ -38,6 +39,13 @@ PhysicBody* p_MakePhysicBody(uint64_t entityID, bool statec)
     pb->accel[2] = 0;
     physicCounter++;
     return pb;
+}
+
+// Does nothing atm, just a reminder that the collision, should it have a type, needs to be manually free'd
+// As it is not part of the arena.
+void p_DeletePhysicsBody()
+{
+
 }
 
 /* typedef struct PhysicBody
@@ -64,13 +72,17 @@ void p_PhysicsUpdate(double deltaTime)
     for (int i = 0; i < physicCounter; i++)
     {
         PhysicBody* body = ar_ArenaIterator(physicArena, &i);
+        if (body->stat){continue;}
         // check for collisions
         for (int j = 0; j < physicCounter; j++)
         {
             if (j == i){continue;}
             PhysicBody* body2 = ar_ArenaIterator(physicArena, &j);
-            if (c_CheckCollisions(body->entity, body->col, body2->entity, body2->col))
+            if (c_CheckCollisions(body->entity, body, body2->entity, body2, deltaTime))
             {
+                body->velocity[0] += -body->velocity[0]*2*body->bounce;
+                body->velocity[1] += -body->velocity[1]*2*body->bounce;
+                body->velocity[2] += -body->velocity[2]*2*body->bounce;
                 // Add velocity to the other body
             }
         }
@@ -80,7 +92,20 @@ void p_PhysicsUpdate(double deltaTime)
         body->velocity[2] += body->accel[2]*deltaTime;
         // Update position based on velocity
         Entity* e1 =  e_GetEntity(body->entity);
-        e_SetEnitityPosition(body->entity, (vec3){e1->position[0] + (body->velocity[0]*deltaTime), 
-                             e1->position[1] + (body->velocity[1]*deltaTime), e1->position[2] + (body->velocity[2]*deltaTime)});
+        float moveX = 0, moveY = 0, moveZ = 0;
+        if (fabs(body->velocity[0]) > 0.5)
+        {
+            moveX = body->velocity[0]*deltaTime;
+        }
+        if (fabs(body->velocity[1]) > 0.5)
+        {
+            moveY = body->velocity[1]*deltaTime;
+        }
+        if (fabs(body->velocity[2]) > 0.5)
+        {
+            moveZ = body->velocity[2]*deltaTime;
+        }
+        e_SetEnitityPosition(body->entity, (vec3){e1->position[0] + (moveX), 
+                             e1->position[1] + (moveY), e1->position[2] + (moveZ)});
     }
 }

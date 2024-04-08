@@ -88,8 +88,8 @@ typedef struct Entity
 
 typedef enum ColliderType
 {
-	cl_NONE 		= 0x00000001,
-	cl_AABB 		= 0x00000002
+	cl_NONE 		= 0x00000000,
+	cl_AABB 		= 0x00000001
 } ColliderType;
 
 typedef struct ColliderContainer

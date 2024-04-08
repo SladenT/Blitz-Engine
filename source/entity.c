@@ -82,6 +82,14 @@ void e_SetEnitityScale(uint64_t id, vec3 scale)
     en->scale[2] = scale[2];
 }
 
+void e_TranslateEntityBy(uint64_t id, vec3 diff)
+{
+    Entity* en = (Entity*)idArr[id];
+    en->position[0] += diff[0];
+    en->position[1] += diff[1];
+    en->position[2] += diff[2];
+}
+
 // angle in radians
 void e_OrbitAroundEntity(uint64_t id1, uint64_t id2, float angle, float radius)
 {
