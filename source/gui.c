@@ -24,6 +24,7 @@ struct nk_glfw glfw = {0};
 struct nk_context* ctx;
 GLFWwindow* win;
 struct nk_font_atlas *atlas;
+int width1, height1;
  
 void gui_Init(GLFWwindow* window)
 {
@@ -32,8 +33,7 @@ void gui_Init(GLFWwindow* window)
 
     nk_glfw3_font_stash_begin(&glfw, &atlas);
     nk_glfw3_font_stash_end(&glfw);
-
-    
+ 
 }
 
 void gui_Render()
@@ -59,7 +59,9 @@ void gui_admin()
             static int property = 20;
             nk_layout_row_static(ctx, 30, 80, 1);
             if (nk_button_label(ctx, "button"))
+            {
                 fprintf(stdout, "button pressed\n");
+            }
 
             nk_layout_row_dynamic(ctx, 30, 2);
             if (nk_option_label(ctx, "toggle 1", op == EASY)) op = EASY;
@@ -68,15 +70,17 @@ void gui_admin()
             nk_layout_row_dynamic(ctx, 25, 1);
             nk_property_int(ctx, "Volume:", 0, &property, 100, 10, 1);
             
-            }
+        }
     nk_end(ctx);
 }
 
 void gui_settings()
 {
-    
+    //size of initial window: 960,540
+    //to do: make scale when minimized
     if (nk_begin(ctx, "Settings", nk_rect(730, 5, 225, 100), NK_WINDOW_BORDER|NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE|NK_WINDOW_MOVABLE))
         {
+            nk_window_set_position(ctx, "Settings", nk_vec2(get_width() - 230 , 5));
             static float value = 0.6f;
 
             nk_layout_row_begin(ctx, NK_STATIC, 30, 2);
@@ -90,4 +94,16 @@ void gui_settings()
 
         }
     nk_end(ctx);
+}
+
+get_height()
+{
+    glfwGetWindowSize(win, &width1, &height1);
+    return height1;
+}
+
+get_width()
+{
+    glfwGetWindowSize(win, &width1, &height1);
+    return width1;
 }
