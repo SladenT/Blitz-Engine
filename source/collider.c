@@ -56,25 +56,6 @@ void c_SetDefaultAABB(PhysicBody* body)
 // Returns -1 at no intersection
 float c_RayAABBIntersection(Ray r, Rect3D a, uint64_t entID)
 {
-    /* float d1 = ( a.x      - r.origin[0]) / r.dir[0];
-    float d2 = ((a.x+a.w) - r.origin[0]) / r.dir[0];
-    float d3 = ( a.y      - r.origin[1]) / r.dir[1];
-    float d4 = ((a.y+a.h) - r.origin[1]) / r.dir[1];
-    float d5 = ( a.z      - r.origin[2]) / r.dir[2];
-    float d6 = ((a.z+a.d) - r.origin[2]) / r.dir[2];
-
-    float dmin = fmax(fmax(fmin(d1, d2), fmin(d3, d4)), fmin(d5, d6));
-    float dmax = fmin(fmin(fmax(d1, d2), fmax(d3, d4)), fmax(d5, d6));
-
-    // AABB is behind us, but in vector direction
-    if (dmax < 0) {return -1;}
-
-    // No intersection
-    if (dmin > dmax) {return -1;}
-
-    // Intersection, return distance along ray
-    if (dmin < 0.0f) {return dmax;}
-    return dmin; */
     Entity* ent = e_GetEntity(entID);
     float t0 = (a.x+ent->position[0] +      ((ent->scale[0])*-1) - r.origin[0]) * (1/r.dir[0]);
     float t1 = (a.x+ent->position[0] + a.w +((ent->scale[0])*-1) - r.origin[0]) * (1/r.dir[0]);

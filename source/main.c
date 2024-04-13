@@ -76,6 +76,10 @@ int main(void)
 	{
         double deltaTime = glfwGetTime() - lastTime;
         lastTime = glfwGetTime();
+        if (deltaTime > 0.1)
+        {
+            deltaTime = 0;
+        }
         p_PhysicsUpdate(deltaTime);
         r3d_RenderPass(window, deltaTime);
 		gui_Render();

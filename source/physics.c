@@ -37,6 +37,7 @@ PhysicBody* p_MakePhysicBody(uint64_t entityID, bool statec)
     pb->accel[0] = 0;
     pb->accel[1] = -9.8;  // Default gravity
     pb->accel[2] = 0;
+    pb->mask = 0x1;
     physicCounter++;
     return pb;
 }
@@ -48,25 +49,10 @@ void p_DeletePhysicsBody()
 
 }
 
-/* typedef struct PhysicBody
-{
-	uint64_t 		  entity;
-	bool 	 		  stat;				// A static physic body is not updated by physics calculations, and is not moved by other physics forces (such as collisions), but
-										// still interacts with other physics bodys e.g. a static landmass
-	ColliderContainer col;
-	float 	 		  mass;
-	float			  friction;
-	float 			  bounce;
-	vec3 	 		  offset;			// This dictates the center of mass, away from entity origin - it does not change the position of the collider.
-	vec3 	 		  velocity;
-	vec3 	 		  accel;			// Typically, this should only be modified for constant acceleration, such as gravity.  More dynamic forms (such as air resistance)
-										// should be custom coded To modify velocity instead
-} PhysicBody; */
-
 
 // Updates all of our physics bodies positions based upon the forces that have been
 // Applied to them, such as gravity, checks for collisions, and rebuilds our spatial
-// Octree
+// Octree (IF I HAD ONE!)
 void p_PhysicsUpdate(double deltaTime)
 {
     for (int i = 0; i < physicCounter; i++)
