@@ -33,6 +33,8 @@ unsigned int depthMap;
 Shader depthShadowShader;
 vec3 lightPos = (vec3) {2.0f, 2.0f, -4.0f};
 
+GLFWwindow *mainWindowContext;
+
 // Test box
 
 static float vertices[] = {
@@ -83,7 +85,8 @@ static float vertices[] = {
 // #region Callback Definitions
 static void FramebufferSizeCallback(GLFWwindow *window, int width, int height)
 {
-    glViewport(0, 0, width, height);
+    SCR_WIDTH = width;
+    SCR_HEIGHT = height;
 }
 static void error_callback(int error, const char* description)
 {
@@ -96,6 +99,21 @@ void r3d_GenerateMeshOne(Model *mod, float vertexData[], int vertAttCount,  int 
 Model* r3d_GenerateModelOne(float vertexData[], int vertAttCount, int indexData[], int indexCount, Shader s, uint64_t entID, uint32_t matID);
 // #endregion
 
+GLFWwindow* r3d_getMainWindow()
+{
+    return mainWindowContext;
+}
+
+unsigned int r3d_GetScreenWidth()
+{
+    return SCR_WIDTH;
+}
+
+unsigned int r3d_GetScreenHeight()
+{
+    return SCR_HEIGHT;
+}
+
 GLFWwindow* r3d_InitWindowRender(void)
 {
     if (!glfwInit())
@@ -106,13 +124,13 @@ GLFWwindow* r3d_InitWindowRender(void)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "ShepRTS", NULL, NULL);
-    if (!window)
+    mainWindowContext = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "ShepRTS", NULL, NULL);
+    if (!mainWindowContext)
     {
         // Window or OpenGL context creation failed
         printf("Window broke");
     }
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(mainWindowContext);
     // Setup the function bindings for later versions of openGL using GLAD
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
     // Wireframe mode
@@ -128,7 +146,7 @@ GLFWwindow* r3d_InitWindowRender(void)
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     // Setup callback
     glfwSetErrorCallback(error_callback);
-    glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
+    glfwSetFramebufferSizeCallback(mainWindowContext, FramebufferSizeCallback);
 
     // Temp for test display
     /* Shader s = sh_BuildShader("def.vs", "def.fs");
@@ -156,7 +174,7 @@ GLFWwindow* r3d_InitWindowRender(void)
 
     depthShadowShader = sh_BuildShader("shadowmap.vs", "shadowmap.fs");
 
-    return window;
+    return mainWindowContext;
 }
 
 Model* r3d_GenerateModelOne(float vertexData[], int vertAttCount, int indexData[], int indexCount, Shader s, uint64_t entID, uint32_t matID)

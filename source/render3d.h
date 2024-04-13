@@ -16,6 +16,11 @@ Model* r3d_GenerateModelOne(float vertexData[], int vertAttCount, int indexData[
 Model* r3d_GenerateFromMeshData(MeshData data, Shader s, uint64_t entID, uint32_t matID);
 
 
+GLFWwindow* r3d_getMainWindow();
+unsigned int r3d_GetScreenWidth();
+unsigned int r3d_GetScreenHeight();
+
+
 
 
 

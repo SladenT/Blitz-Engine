@@ -6,6 +6,7 @@
 ********************************************************************************************/
 #include "entity.h"
 #include "collider.h"
+#include "render3d.h"
 #include <stdio.h>
 #include <math.h>
 
@@ -85,6 +86,44 @@ float c_RayAABBIntersection(Ray r, Rect3D a, uint64_t entID)
     tmax = fmin(tmax, fmax(t0, t1));
 
     return tmax > fmax(tmin, 0.0) ? tmin : -1;
+}
+
+Ray c_GetMouseRay(Camera c)
+{
+    Ray ray = {0};
+    double mouseX;
+    double mouseY;
+    glfwGetCursorPos(r3d_getMainWindow(), &mouseX, &mouseY);
+    float x = (2.0f*mouseX)/(float)r3d_GetScreenWidth() - 1.0f;
+    float y = 1.0f - (2.0f*mouseY)/(float)r3d_GetScreenHeight();
+    
+    // Get our camera matrices
+    mat4 view;
+    cam_GetCamTransform(c, view);
+    mat4 proj;
+    glmc_mat4_copy(c.projection, &proj);
+
+    // Invert them
+    mat4 viewInv, projInv;
+    glmc_mat4_inv(view, viewInv);
+    glmc_mat4_inv(proj, projInv);
+
+    // Get our clipping plane by multiplying the inverse projection
+    versor clip = {x, y, -1.0, 1.0};
+    versor eye;
+    glm_mat4_mulv(projInv, clip, eye);
+    eye[2] = -1;
+    eye[3] =  0;
+
+    // Then get our direciton by multiplying the inverse view matrix
+    versor direc;
+    glm_mat4_mulv(viewInv, eye, direc);
+    vec3 direction = {direc[0], direc[1], direc[2]};
+    glmc_vec3_normalize(direction);
+
+    glmc_vec3_copy(c.position, ray.origin); 
+    glmc_vec3_copy(direction, ray.dir);
+    return ray;
 }
 
 

@@ -69,7 +69,16 @@ int main(void)
     m3->vertexCount  = bush.indexCount;
     m4->vertexCount  = box.indexCount;
 
-    double x = 0x1p53;
+    /* Ray raytest;
+    raytest.origin[0] = 0;
+    raytest.origin[1] = 0;
+    raytest.origin[2] = 0;
+
+    raytest.dir[0] = 1;
+    raytest.dir[1] = 0;
+    raytest.dir[2] = 0; */
+
+
 
     lastTime = glfwGetTime();
     while (!glfwWindowShouldClose(window))
@@ -79,9 +88,16 @@ int main(void)
         if (deltaTime > 0.1)
         {
             deltaTime = 0;
-        }
+        }/* 
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
+        {
+            raytest = c_GetMouseRay(*c);
+            float f = c_RayAABBIntersection(raytest, *(Rect3D*)e2p->col.mem, ent);
+            printf("%f", f);
+        } */
         p_PhysicsUpdate(deltaTime);
         r3d_RenderPass(window, deltaTime);
+        //debug_DrawRay(raytest);
 		gui_Render();
         glfwSwapBuffers(window);
         glfwPollEvents();
