@@ -14,6 +14,7 @@
 #include "structs.h"
 #include "camera.h"
 #include "collider.h"
+#include "debug.h"
 #include <stb_image.h>
 #include <stdio.h>
 
@@ -26,6 +27,7 @@ int main(void)
     res_InitImport();
     gui_Init(window);
     p_PhysicsInit();
+    debug_Init();
 
     Camera *c = cam_GetMainCamera();
     cam_TranslateCameraBy(c, (vec3){0.0f, 3.0, 4.0f});
@@ -67,16 +69,17 @@ int main(void)
     m3->vertexCount  = bush.indexCount;
     m4->vertexCount  = box.indexCount;
 
+    double x = 0x1p53;
+
     lastTime = glfwGetTime();
     while (!glfwWindowShouldClose(window))
 	{
-        
         double deltaTime = glfwGetTime() - lastTime;
         lastTime = glfwGetTime();
-
         p_PhysicsUpdate(deltaTime);
         r3d_RenderPass(window, deltaTime);
 		gui_Render();
+        glfwSwapBuffers(window);
         glfwPollEvents();
     }
     glfwTerminate();

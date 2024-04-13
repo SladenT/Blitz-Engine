@@ -6,6 +6,7 @@
 #ifndef structsh
 #define structsh
 #include "memarena.h"
+#include <cglm/call.h>
 
 //-----------------------------------------------------------------------------
 //{ Shader Definitions 
@@ -46,7 +47,11 @@ typedef struct MeshData
 //} End Mesh Data Definitions 
 //-----------------------------------------------------------------------------
 
-
+typedef struct Ray
+{
+	vec3 origin;
+	vec3 dir;
+} Ray;
 
 
 

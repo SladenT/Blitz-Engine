@@ -47,7 +47,6 @@ void gui_Render()
     gui_settings();
     
     nk_glfw3_render(&glfw, NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER, MAX_ELEMENT_BUFFER);
-    glfwSwapBuffers(win);
 }
 
 void gui_admin()
