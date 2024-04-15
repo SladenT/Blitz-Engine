@@ -1,5 +1,5 @@
 /*******************************************************************************************
-*	Basic gui initialization
+*	Basic gui 
 *	Work in progress
 *
 *   Created by Evan Posharow
@@ -16,6 +16,7 @@
 #define NK_KEYSTATE_BASED_INPUT
 #include <nuklear/nuklear.h>
 #include <nuklear/nuklear_glfw_gl3.h>
+#include <nuklear/style.c>
 
 #define MAX_VERTEX_BUFFER 512 * 1024
 #define MAX_ELEMENT_BUFFER 128 * 1024
@@ -38,8 +39,6 @@ void gui_Init(GLFWwindow* window)
 
 void gui_Render()
 {
-        // GUI
-    //if (nk_begin(ctx, "GUI Version 1", nk_rect(50, 50, 230, 250), NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE))
     glfwPollEvents();
     nk_glfw3_new_frame(&glfw);
 
@@ -76,12 +75,13 @@ void gui_admin()
 void gui_settings()
 {
     //size of initial window: 960,540
-    //to do: make scale when minimized
-    if (nk_begin(ctx, "Settings", nk_rect(730, 5, 225, 100), NK_WINDOW_BORDER|NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE|NK_WINDOW_MOVABLE))
+    if (nk_begin(ctx, "Settings", nk_rect(730, 5, 225, 200), NK_WINDOW_BORDER|NK_WINDOW_TITLE|NK_WINDOW_MOVABLE))
         {
+            //repositions gui when window size changes
             nk_window_set_position(ctx, "Settings", nk_vec2(get_width() - 230 , 5));
-            static float value = 0.6f;
 
+            //Volume slider
+            static float value = 0.6f;
             nk_layout_row_begin(ctx, NK_STATIC, 30, 2);
                 {
                     nk_layout_row_push(ctx, 50);
@@ -90,6 +90,37 @@ void gui_settings()
                     nk_slider_float(ctx, 0, &value, 1.0f, 0.1f);
                  }
             nk_layout_row_end(ctx);
+
+            //Theme selector
+            enum {BLACK, BLUE, DARK, RED, WHITE};
+            static int current_Theme = RED;
+            nk_layout_row_dynamic(ctx, 30, 2);
+            if(nk_option_label(ctx, "red", current_Theme == RED))
+            {
+                current_Theme = RED;
+                set_style(ctx, THEME_RED);
+            } 
+            if(nk_option_label(ctx, "blue", current_Theme == BLUE)) 
+            {
+                current_Theme = BLUE;
+                set_style(ctx, THEME_BLUE);
+            } 
+            if(nk_option_label(ctx, "dark", current_Theme == DARK)) 
+            {
+                current_Theme = DARK;
+                set_style(ctx, THEME_DARK);
+            } 
+            if(nk_option_label(ctx, "black", current_Theme == BLACK)) 
+            {
+                current_Theme = BLACK;
+                set_style(ctx, THEME_BLACK);
+            } 
+            if(nk_option_label(ctx, "white", current_Theme == WHITE)) 
+            {
+                current_Theme = WHITE;
+                set_style(ctx, THEME_WHITE);
+            } 
+            
 
         }
     nk_end(ctx);
