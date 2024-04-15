@@ -15,13 +15,20 @@
 #include "camera.h"
 #include "collider.h"
 #include "debug.h"
+#include "game.h"
 #include <stb_image.h>
 #include <stdio.h>
 
 static double lastTime;
 
+void test(const char* var)
+{
+    printf(var);
+}
+
 int main(void)
 {
+    // Engine Initialization Steps
     e_InitEntities();
     GLFWwindow* window = r3d_InitWindowRender();
     res_InitImport();
@@ -29,8 +36,8 @@ int main(void)
     p_PhysicsInit();
     debug_Init();
 
-    Camera *c = cam_GetMainCamera();
-    cam_TranslateCameraBy(c, (vec3){0.0f, 3.0, 4.0f});
+    // Game initialization
+    GameInitialize();
 
     MeshData box = res_ImportMesh("../res/meshes/box.obj");
     MeshData bush = res_ImportMesh("../res/meshes/bush_01.obj");
@@ -41,22 +48,25 @@ int main(void)
     e_SetEnitityPosition(ent, (vec3) {5.0,0,0});
     PhysicBody* e2p = p_MakePhysicBody(ent, false);
     c_SetDefaultAABB(e2p);
+    e2p->mask += 0x00000004;
 
     uint64_t ent2 = e_CreateEntity();
     //e_SetEnitityScale(ent2, (vec3) {0.03,0.03,0.03});
     e_SetEnitityPosition(ent2, (vec3) {-5.0,0,0});
     PhysicBody* e1p = p_MakePhysicBody(ent2, false);
     c_SetDefaultAABB(e1p);
+    e1p->mask += 0x00000004;
 
     uint64_t ent3 = e_CreateEntity();
     e_SetEnitityScale(ent3, (vec3) {0.03,0.03,0.03});
-    e_SetEnitityPosition(ent3, (vec3) {0.0,0,-3.0});
+    e_SetEnitityPosition(ent3, (vec3) {0.0,-3.5,-3.0});
 
     uint64_t ent4 = e_CreateEntity();
     e_SetEnitityPosition(ent4, (vec3) {0,-5,0});
     e_SetEnitityScale(ent4, (vec3) {20,1,20});
     PhysicBody* e3p = p_MakePhysicBody(ent4, true);
     c_SetDefaultAABB(e3p);
+    e3p->mask += 0x00000002;
 
 
     Model *m = r3d_GenerateFromMeshData(box, s, ent, mat_CreateDefaultMaterial(1, ent, false));
@@ -69,17 +79,6 @@ int main(void)
     m3->vertexCount  = bush.indexCount;
     m4->vertexCount  = box.indexCount;
 
-    /* Ray raytest;
-    raytest.origin[0] = 0;
-    raytest.origin[1] = 0;
-    raytest.origin[2] = 0;
-
-    raytest.dir[0] = 1;
-    raytest.dir[1] = 0;
-    raytest.dir[2] = 0; */
-
-
-
     lastTime = glfwGetTime();
     while (!glfwWindowShouldClose(window))
 	{
@@ -88,16 +87,13 @@ int main(void)
         if (deltaTime > 0.1)
         {
             deltaTime = 0;
-        }/* 
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
-        {
-            raytest = c_GetMouseRay(*c);
-            float f = c_RayAABBIntersection(raytest, *(Rect3D*)e2p->col.mem, ent);
-            printf("%f", f);
-        } */
+        }
+        PlayerControls(deltaTime);
+        
+        // Engine Updates
         p_PhysicsUpdate(deltaTime);
         r3d_RenderPass(window, deltaTime);
-        //debug_DrawRay(raytest);
+        // Render the GUI last, as it disables the depth bit testing
 		gui_Render();
         glfwSwapBuffers(window);
         glfwPollEvents();

@@ -54,12 +54,27 @@ void c_SetDefaultAABB(PhysicBody* body)
     body->col.mem = colbox1;
 }
 
+void c_SetDefaultAABBTrigger(PhysicBody* body, void* event)
+{
+    body->col.colliderType = cl_AABB;
+    Rect3D* colbox1 = malloc(sizeof(Rect3D) + sizeof(ColliderTrigger));
+    colbox1->x = 0;
+    colbox1->y = 0;
+    colbox1->z = 0;
+    colbox1->w = 2;
+    colbox1->h = 2;
+    colbox1->d = 2;
+    ColliderTrigger* trigger = colbox1 + 1;         // Increments by the size of the entire Rect3D
+    trigger->event = event;
+    body->col.mem = colbox1;
+}
+
 // Returns -1 at no intersection
 float c_RayAABBIntersection(Ray r, Rect3D a, uint64_t entID)
 {
     Entity* ent = e_GetEntity(entID);
-    float t0 = (a.x+ent->position[0] +      ((ent->scale[0])*-1) - r.origin[0]) * (1/r.dir[0]);
-    float t1 = (a.x+ent->position[0] + a.w +((ent->scale[0])*-1) - r.origin[0]) * (1/r.dir[0]);
+    float t0 = (a.x+ent->position[0] +                       ((ent->scale[0])*-1) - r.origin[0]) * (1/r.dir[0]);
+    float t1 = (a.x+ent->position[0] + (a.w*ent->scale[0]) + ((ent->scale[0])*-1) - r.origin[0]) * (1/r.dir[0]);
     if (a.x+ent->position[0] + ((ent->scale[0]-1)*-1) - r.origin[0] == 0 && r.dir[0] == 0)
     {
         t0 = 0;
@@ -67,8 +82,8 @@ float c_RayAABBIntersection(Ray r, Rect3D a, uint64_t entID)
     float tmin = fmin(t0, t1);
     float tmax = fmax(t0, t1);
 
-    t0 = (a.y+ent->position[1] +      ((ent->scale[1])*-1) - r.origin[1]) * (1/r.dir[1]);
-    t1 = (a.y+ent->position[1] + a.h +((ent->scale[1])*-1) - r.origin[1]) * (1/r.dir[1]);
+    t0 = (a.y+ent->position[1] +                       ((ent->scale[1])*-1) - r.origin[1]) * (1/r.dir[1]);
+    t1 = (a.y+ent->position[1] + (a.h*ent->scale[1]) + ((ent->scale[1])*-1) - r.origin[1]) * (1/r.dir[1]);
     if (a.y+ent->position[1] + ((ent->scale[1]-1)*-1) - r.origin[1] == 0 && r.dir[1] == 0)
     {
         t0 = 0;
@@ -76,8 +91,8 @@ float c_RayAABBIntersection(Ray r, Rect3D a, uint64_t entID)
     tmin = fmax(tmin, fmin(t0, t1));
     tmax = fmin(tmax, fmax(t0, t1));
 
-    t0 = (a.z+ent->position[2] +      ((ent->scale[2])*-1) - r.origin[2]) * (1/r.dir[2]);
-    t1 = (a.z+ent->position[2] + a.d +((ent->scale[2])*-1) - r.origin[2]) * (1/r.dir[2]);
+    t0 = (a.z+ent->position[2] +                       ((ent->scale[2])*-1) - r.origin[2]) * (1/r.dir[2]);
+    t1 = (a.z+ent->position[2] + (a.d*ent->scale[2]) + ((ent->scale[2])*-1) - r.origin[2]) * (1/r.dir[2]);
     if (a.z+ent->position[2] + ((ent->scale[2]-1)*-1) - r.origin[2] == 0 && r.dir[2] == 0)
     {
         t0 = 0;

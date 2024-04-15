@@ -89,14 +89,15 @@ typedef struct Entity
 typedef enum ColliderType
 {
 	cl_NONE 		= 0x00000000,
-	cl_AABB 		= 0x00000001
+	cl_AABB 		= 0x00000001,
+	cl_TRIGGER		= 0X00000002
 } ColliderType;
 
 typedef struct ColliderContainer
 {
 	uint32_t colliderType;
 	vec3 	 offset;
-	void* 	 mem; 
+	void* 	 mem; 				// Contains the collider data - if a trigger, the collider definition comes before the trigger memory section
 } ColliderContainer;
 
 typedef struct Rect3D
@@ -108,6 +109,11 @@ typedef struct Rect3D
 	float d;
 	float h;
 } Rect3D;
+
+typedef struct ColliderTrigger
+{
+	void (*event)();
+} ColliderTrigger;
 
 //#endregion
 

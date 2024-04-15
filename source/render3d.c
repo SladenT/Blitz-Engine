@@ -258,31 +258,6 @@ void r3d_RenderPass(GLFWwindow* window, double deltaTime)
     float gValue = 0.5f;
     float rValue = 0.5f;
     float bValue = 0.5f;
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-    {
-        //glmc_translate(c->transform, (vec3){0.0f,0.0f,1.0 * deltaTime});
-        cam_TranslateCameraBy(c, (vec3){0.0f,0.0f,-1.0 * deltaTime});
-    }
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-    {
-        //glmc_translate(c->transform, (vec3){0.0f,0.0f,-1.0 * deltaTime});
-        cam_TranslateCameraBy(c, (vec3){0.0f,0.0f,1.0 * deltaTime});
-    }
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-    {
-        //glmc_translate(c->transform, (vec3){1.0 * deltaTime,0.0f,0.0f});
-        cam_TranslateCameraBy(c, (vec3){-1.0 * deltaTime,0.0f,0.0f});
-    }
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-    {
-        //glmc_translate(c->transform, (vec3){-1.0 * deltaTime,0.0f,0.0f});
-        cam_TranslateCameraBy(c, (vec3){1.0 * deltaTime,0.0f,0.0f});
-    }
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-    {
-        //glmc_translate(c->transform, (vec3){0.0f,-1.0 * deltaTime,0.0f});
-        cam_TranslateCameraBy(c, (vec3){0.0f, 1.0 * deltaTime,0.0f});
-    }
     mat4 camTransform;
     cam_GetCamTransform(*c, camTransform);
 

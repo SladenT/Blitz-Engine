@@ -14,6 +14,7 @@ void e_RotateBy(uint64_t id, float angle, vec3 axis);
 void e_TranslateEntityBy(uint64_t id, vec3 diff);
 
 Entity* e_GetEntity(uint64_t id);
+void e_GetEntityPosition(uint64_t id, vec3 *outPos);
 
 
 

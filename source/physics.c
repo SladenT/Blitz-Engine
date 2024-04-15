@@ -49,6 +49,50 @@ void p_DeletePhysicsBody()
 
 }
 
+// If we only care about the closest
+uint64_t p_CheckRaycast(Ray ray, uint64_t mask)
+{
+    float lowest = 99999999999.0f;
+    uint64_t lowestID = UINT64_MAX;
+    for (int i = 0; i < physicCounter; i++)
+    {
+        PhysicBody* body = ar_ArenaIterator(physicArena, &i);
+        if ((body->mask & mask) == 0){continue;}
+        float rayDistance = c_RayAABBIntersection(ray, *(Rect3D*)body->col.mem, body->entity);
+        if (rayDistance != -1)
+        {
+            if (rayDistance < lowest)
+            {
+                lowest = rayDistance;
+                lowestID = body->entity;
+            }
+        }
+    }
+    if (lowest == 99999999999.0f){return UINT64_MAX;}
+    return lowestID;
+}
+
+// If we only care about the closest distance
+float p_CheckRaycastDist(Ray ray, uint64_t mask)
+{
+    float lowest = 99999999999.0f;
+    for (int i = 0; i < physicCounter; i++)
+    {
+        PhysicBody* body = ar_ArenaIterator(physicArena, &i);
+        if ((body->mask & mask) == 0){continue;}
+        float rayDistance = c_RayAABBIntersection(ray, *(Rect3D*)body->col.mem, body->entity);
+        if (rayDistance != -1)
+        {
+            if (rayDistance < lowest)
+            {
+                lowest = rayDistance;
+            }
+        }
+    }
+    if (lowest == 99999999999.0f){return -1.0f;}
+    return lowest;
+}
+
 
 // Updates all of our physics bodies positions based upon the forces that have been
 // Applied to them, such as gravity, checks for collisions, and rebuilds our spatial
