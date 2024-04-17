@@ -30,6 +30,10 @@ struct moveData
 // Threading Concurrency
 uint64_t cycleCount = 0;
 
+// Move Check
+bool moving[65536];
+bool checkMove[65536];
+
 
 // Selection
 uint64_t selectedEntity = UINT64_MAX;
@@ -53,19 +57,32 @@ static void TestThread(void* arguments)
     float t = 0;
     int count = cycleCount;
     free(data);
+    if (moving[entID])
+    {
+        checkMove[entID] = true;
+        while(moving[entID]){}
+    }
+    float distance = glmc_vec3_distance(from, goTo);
+    checkMove[entID] = false;
     while (t <= 1.0f)
     {
         if (count <= cycleCount)
         {
+            moving[entID] = true;
             vec3 move;
             glmc_vec3_lerp(from, goTo, t, move);
             e_SetEnitityPosition(entID, move);
             count = cycleCount + 1;
-            t += deltaTime;
+            t += (deltaTime/distance) * 10;
+            if (checkMove[entID])
+            {
+                break;
+            }
         }
     }
     // Kill thread
     pthread_detach(pthread_self());
+    moving[entID] = false;
 }
 
 void PlayerControls(double d_deltaTime)

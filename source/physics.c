@@ -42,7 +42,7 @@ PhysicBody* p_MakePhysicBody(uint64_t entityID, bool statec)
     return pb;
 }
 
-// Does nothing atm, just a reminder that the collision, should it have a type, needs to be manually free'd
+// Does nothing atm, just a reminder that the collider, should it have a type, needs to be manually free'd
 // As it is not part of the arena.
 void p_DeletePhysicsBody()
 {
