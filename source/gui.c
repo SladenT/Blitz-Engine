@@ -44,6 +44,7 @@ void gui_Render()
 
     gui_admin();
     gui_settings();
+    gui_buildings();
     
     nk_glfw3_render(&glfw, NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER, MAX_ELEMENT_BUFFER);
 }
@@ -120,6 +121,53 @@ void gui_settings()
                 current_Theme = WHITE;
                 set_style(ctx, THEME_WHITE);
             } 
+            
+
+        }
+    nk_end(ctx);
+}
+
+void gui_buildings()
+{
+    // to do: add nk_rect as constants
+    //        add curency and gui for currency
+    //        add main menu
+    if (nk_begin(ctx, "Build", nk_rect(240, 432, 480, 108), NK_WINDOW_BORDER|NK_WINDOW_MOVABLE))
+        {   
+            //scale position with window
+            int testy = (get_width()/2) - (get_width()/4);
+            nk_window_set_position(ctx, "Build", nk_vec2((get_width()/2) - (get_width()/4) , get_height() - 108));
+
+            //scale size with window
+            nk_window_set_size(ctx,"Build", nk_vec2(get_width()/2 , 108));
+
+            nk_layout_row_dynamic(ctx, 20, 1);
+            nk_label(ctx, "Price:", NK_TEXT_ALIGN_CENTERED);
+
+            nk_layout_row_dynamic(ctx, 20, 4);
+            nk_label_colored(ctx, "100 Gold", NK_TEXT_ALIGN_CENTERED, nk_rgb(240, 252, 3));
+            nk_label_colored(ctx, "200 Wood",   NK_TEXT_ALIGN_CENTERED, nk_rgb(0, 255, 0));
+            nk_label(ctx, "idk", NK_TEXT_ALIGN_CENTERED);
+            nk_label(ctx, "zero", NK_TEXT_ALIGN_CENTERED);
+            // nk_label(ctx, "zero", NK_TEXT_ALIGN_CENTERED);
+
+            nk_layout_row_dynamic(ctx, 36, 4);
+            if (nk_button_label(ctx, "Buy Units"))
+            {
+                fprintf(stdout, "\nBought a unit");
+            }
+            if (nk_button_label(ctx, "Build Tree"))
+            {
+                fprintf(stdout, "\nBuilt a Tree");
+            }
+            if (nk_button_label(ctx, "testing 1"))
+            {
+                fprintf(stdout, "\nstill testing 1");
+            }
+            if (nk_button_label(ctx, "testing 2"))
+            {
+                fprintf(stdout, "\nstill testing 2");
+            }
             
 
         }
