@@ -59,7 +59,7 @@ static void InitializeMainCamera(float aspectRatio)
 	
 	mat4 projection;
 	glmc_mat4_identity(projection);
-	glmc_perspective(glm_rad(45.0f), aspectRatio, 0.1f, 10000.0f, projection);
+	glmc_perspective(glm_rad(60.0f), aspectRatio, 0.1f, 10000.0f, projection);
     
     //glmc_mat4_copy(view, mainCam->transform);
     glmc_mat4_copy(projection, mainCam->projection);
@@ -68,7 +68,7 @@ static void InitializeMainCamera(float aspectRatio)
     mainCam->position[1] = 2.0f;
     mainCam->position[2] = 3.0f;
     mainCam->rotation[0] = 0.0f;
-    mainCam->rotation[1] = -0.5f;
+    mainCam->rotation[1] = -glm_rad(60.0f);
     mainCam->rotation[2] = -1.0f;
 }
 

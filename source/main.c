@@ -39,45 +39,7 @@ int main(void)
     // Game initialization
     GameInitialize();
 
-    MeshData box = res_ImportMesh("../res/meshes/box.obj");
-    MeshData bush = res_ImportMesh("../res/meshes/bush_01.obj");
-
-    Shader s = sh_BuildShader("defdir.vs", "defdir.fs");
-    uint64_t ent = e_CreateEntity();
-    //e_SetEnitityScale(ent, (vec3) {0.03,0.03,0.03});
-    e_SetEnitityPosition(ent, (vec3) {5.0,0,0});
-    PhysicBody* e2p = p_MakePhysicBody(ent, false);
-    c_SetDefaultAABB(e2p);
-    e2p->mask += 0x00000004;
-
-    uint64_t ent2 = e_CreateEntity();
-    //e_SetEnitityScale(ent2, (vec3) {0.03,0.03,0.03});
-    e_SetEnitityPosition(ent2, (vec3) {-5.0,0,0});
-    PhysicBody* e1p = p_MakePhysicBody(ent2, false);
-    c_SetDefaultAABB(e1p);
-    e1p->mask += 0x00000004;
-
-    uint64_t ent3 = e_CreateEntity();
-    e_SetEnitityScale(ent3, (vec3) {0.03,0.03,0.03});
-    e_SetEnitityPosition(ent3, (vec3) {0.0,-3.5,-3.0});
-
-    uint64_t ent4 = e_CreateEntity();
-    e_SetEnitityPosition(ent4, (vec3) {0,-5,0});
-    e_SetEnitityScale(ent4, (vec3) {20,1,20});
-    PhysicBody* e3p = p_MakePhysicBody(ent4, true);
-    c_SetDefaultAABB(e3p);
-    e3p->mask += 0x00000002;
-
-
-    Model *m = r3d_GenerateFromMeshData(box, s, ent, mat_CreateDefaultMaterial(1, ent, false));
-    Model *m2 = r3d_GenerateFromMeshData(box, s, ent2, mat_CreateDefaultMaterial(1, ent2, false));
-    Model *m3 = r3d_GenerateFromMeshData(bush, s, ent3, mat_CreateDefaultMaterial(2, ent3, false));
-    Model *m4 = r3d_GenerateFromMeshData(box, s, ent4, mat_CreateDefaultMaterial(1, ent4, false));
-
-    m->vertexCount  = box.indexCount;
-    m2->vertexCount  = box.indexCount;
-    m3->vertexCount  = bush.indexCount;
-    m4->vertexCount  = box.indexCount;
+    
 
     lastTime = glfwGetTime();
     while (!glfwWindowShouldClose(window))

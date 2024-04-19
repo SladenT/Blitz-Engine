@@ -30,13 +30,13 @@ void res_InitImport()
     glGenTextures(1, &texArray0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, texArray0);
     //printf( "glTexStorage3D = %p", glTexStorage3D );
-    glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, 512, 512, 256);
+    glTexStorage3D(GL_TEXTURE_2D_ARRAY, 4, GL_RGBA8, 512, 512, 256);
     //glTexStorage3D(GL_TEXTURE_2D_ARRAY, mipLevelC, GL_RGBA8, wid, hei, layerC);
 	// Texture Parameters (wrapping, mipmaps, etc.)
-	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
    /*  glBindTexture(GL_TEXTURE_2D, texture);
 	// Texture Parameters (wrapping, mipmaps, etc.)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -81,21 +81,7 @@ void res_InitImport()
         closedir(tex1);
     }
     closedir(d);
-    
-
-	/* // Load image into memory
-	int width, height, nrChannels;
-	unsigned char *data = stbi_load("../res/textures/arr0/container.jpg", &width, &height, &nrChannels, 0);
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		printf("Image Failed to Load!");
-	}
-	stbi_image_free(data); */
+    glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 
 }
 

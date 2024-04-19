@@ -207,20 +207,35 @@ Model* r3d_GenerateModelOne(float vertexData[], int vertAttCount, int indexData[
                 versor q;
                 glmc_mat4_identity(m->transform);
                 glmc_mat4_quat(m->transform, q);
-                shaderCount++;
                 m->mat = matID;
                 m->ID = entID;
                 return m;
             }
         }
+        // New shader, add to shader Count
+        shaderGroups[shaderCount].s = s;
+        // TODO: Get texture array for this shader
+        shaderGroups[shaderCount].models = MakeDataArena(Model, 1, 4);
+        shaderGroups[shaderCount].modelCt = 1;
+        Model *m = ar_AllocOne(shaderGroups[shaderCount].models);
+        r3d_GenerateMeshOne(m, vertexData, vertAttCount, indexData, indexCount);
+        versor q;
+        glmc_mat4_identity(m->transform);
+        glmc_mat4_quat(m->transform, q);
+        shaderCount++;
+        m->mat = matID;
+        m->ID = entID;
+        return m;
     }
     // TODO: Add in support for adding more shaders to the shaderGroup Array;
     return NULL;
 }
 
 Model* r3d_GenerateFromMeshData(MeshData data, Shader s, uint64_t entID, uint32_t matID)
-{
-    return r3d_GenerateModelOne(data.vertices, data.vertCount*8, data.indices, data.indexCount, s, entID, matID);
+{   
+    Model* m = r3d_GenerateModelOne(data.vertices, data.vertCount*8, data.indices, data.indexCount, s, entID, matID);
+    m->vertexCount = data.indexCount;
+    return m;
 }
 
 void r3d_GenerateMeshOne(Model *mod, float vertexData[], int vertAttCount,  int indexData[], int indexCount)
@@ -267,7 +282,7 @@ void r3d_RenderPass(GLFWwindow* window, double deltaTime)
     // Shadow Mapping
     mat4 lightProjection, lightView, lightSpaceMatrix;
     float near_plane = -10.0f, far_plane = 20.5f;
-    glmc_ortho(-20.0f, 20.0f, -20.0f, 20.0f, near_plane, far_plane, lightProjection);
+    glmc_ortho(-40.0f, 40.0f, -40.0f, 40.0f, near_plane, far_plane, lightProjection);
     vec3 lightOffset;
     vec3 camPos;
     cam_GetCamPosition(*c, camPos);

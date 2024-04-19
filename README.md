@@ -1,4 +1,4 @@
-This is the capstone project for Shepherd University students Davis Teigeler, Aaron Hartle, and Evan Posharow.  It is an RTS (details pending) created using OpenGL 3.3.
+This is the capstone project for Shepherd University students Davis Teigeler, Aaron Hartle, and Evan Posharow.  It is an RTS (details pending) created using OpenGL 4.2.
 
 ## Build Instructions
 
