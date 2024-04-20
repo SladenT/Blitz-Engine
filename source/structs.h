@@ -53,6 +53,12 @@ typedef struct Ray
 	vec3 dir;
 } Ray;
 
+typedef struct CollisionData
+{
+	vec3 normal;
+	bool collision;
+} CollisionData;
+
 
 
 

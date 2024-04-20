@@ -11,6 +11,7 @@
 
 Arena* physicArena;
 static uint64_t physicCounter = 0;
+void* physicBody[65536];
 
 void p_PhysicsInit()
 {
@@ -39,14 +40,34 @@ PhysicBody* p_MakePhysicBody(uint64_t entityID, bool statec)
     pb->accel[2] = 0;
     pb->mask = 0x1;
     physicCounter++;
+    physicBody[entityID] = pb;
     return pb;
 }
 
-// Does nothing atm, just a reminder that the collider, should it have a type, needs to be manually free'd
-// As it is not part of the arena.
-void p_DeletePhysicsBody()
+PhysicBody* p_GetPBFromEntityID(uint64_t entityID)
 {
+    PhysicBody* pb = (PhysicBody*)physicBody[entityID];
+}
 
+void p_DeletePhysicsBodyFromID(uint64_t entityID)
+{
+    PhysicBody* pb = physicBody[entityID];
+    if (pb->col.colliderType != 0)
+    {
+        free(pb->col.mem);
+    }
+    ar_Free(physicArena, pb);
+    physicBody[entityID] = 0;
+}
+
+void p_DeletePhysicsBody(PhysicBody* pb)
+{
+    if (pb->col.colliderType != 0)
+    {
+        free(pb->col.mem);
+    }
+    physicBody[pb->entity] = 0;
+    ar_Free(physicArena, pb);
 }
 
 // If we only care about the closest
@@ -103,25 +124,17 @@ void p_PhysicsUpdate(double deltaTime)
     {
         PhysicBody* body = ar_ArenaIterator(physicArena, &i);
         if (body->stat){continue;}
-        // check for collisions
-        for (int j = 0; j < physicCounter; j++)
-        {
-            if (j == i){continue;}
-            PhysicBody* body2 = ar_ArenaIterator(physicArena, &j);
-            if (c_CheckCollisions(body->entity, body, body2->entity, body2, deltaTime))
-            {
-                body->velocity[0] += -body->velocity[0]*2*body->bounce;
-                body->velocity[1] += -body->velocity[1]*2*body->bounce;
-                body->velocity[2] += -body->velocity[2]*2*body->bounce;
-                // Add velocity to the other body
-            }
-        }
+        
         // Update velocity based on acceleration
         body->velocity[0] += body->accel[0]*deltaTime;
         body->velocity[1] += body->accel[1]*deltaTime;
         body->velocity[2] += body->accel[2]*deltaTime;
         // Update position based on velocity
         Entity* e1 =  e_GetEntity(body->entity);
+        // Remember position before move for collisions
+        body->prevPos[0] = e1->position[0];
+        body->prevPos[1] = e1->position[1];
+        body->prevPos[2] = e1->position[2];
         float moveX = 0, moveY = 0, moveZ = 0;
         if (fabs(body->velocity[0]) > 0.5)
         {
@@ -137,5 +150,40 @@ void p_PhysicsUpdate(double deltaTime)
         }
         e_SetEnitityPosition(body->entity, (vec3){e1->position[0] + (moveX), 
                              e1->position[1] + (moveY), e1->position[2] + (moveZ)});
+        
+        // check for collisions
+        for (int j = 0; j < physicCounter; j++)
+        {
+            if (j == i){continue;}
+            PhysicBody* body2 = ar_ArenaIterator(physicArena, &j);
+            CollisionData* cd = c_CheckCollisions(body->entity, body, body2->entity, body2, deltaTime);
+            if (cd->collision)
+            {
+                if (cd->normal[0] != 0)
+                {
+                    e_SetEnitityPosition(body->entity, (vec3){body->prevPos[0], body->prevPos[1] + (moveY), body->prevPos[2] + (moveZ)});
+                }
+                else if (cd->normal[1] != 0)
+                {
+                    e_SetEnitityPosition(body->entity, (vec3){body->prevPos[0] + (moveX), body->prevPos[1], body->prevPos[2] + (moveZ)});
+                }
+                else
+                {
+                    e_SetEnitityPosition(body->entity, (vec3){body->prevPos[0] + (moveX), body->prevPos[1] + (moveY), body->prevPos[2]});
+                }
+
+                // Newton's Law (TODO: Change to reflection about the normal)
+                body->velocity[0] += -body->velocity[0]*body->bounce*body->friction*body2->friction;
+                body->velocity[1] += -body->velocity[1]*2*body->bounce;
+                body->velocity[2] += -body->velocity[2]*body->bounce*body->friction*body2->friction;
+                // Add velocity to the other body
+                if (!body2->stat)
+                {
+                    body2->velocity[0] += body->velocity[0]*body->bounce*body->friction;
+                    body2->velocity[1] += body->velocity[1]*2*body->bounce;
+                    body2->velocity[2] += body->velocity[2]*body->bounce*body->friction;
+                }
+            }
+        }
     }
 }

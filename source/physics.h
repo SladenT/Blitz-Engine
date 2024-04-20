@@ -10,6 +10,8 @@ void p_PhysicsUpdate(double deltaTime);
 uint64_t p_CheckRaycast(Ray ray, uint64_t mask);
 float p_CheckRaycastDist(Ray ray, uint64_t mask);
 
+PhysicBody* p_GetPBFromEntityID(uint64_t entityID);
+
 
 
 

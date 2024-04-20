@@ -131,6 +131,7 @@ typedef struct PhysicBody
 	vec3 	 		  velocity;
 	vec3 	 		  accel;			// Typically, this should only be modified for constant acceleration, such as gravity.  More dynamic forms (such as air resistance)
 										// should be custom coded To modify velocity instead
+	vec3			  prevPos;			// Used to ensure we don't end up inside colliders.
 	uint64_t 		  mask;				// Two physic bodies need to have a bit in common between masks in order to interact.  Default mask is 0x1.
 } PhysicBody;
 

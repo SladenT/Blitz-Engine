@@ -102,6 +102,7 @@ static void MoveUnit(void* arguments)
     vec3 goTo = {data->moveTo[0], data->moveTo[1], data->moveTo[2]};
     float t = 0;
     int count = cycleCount;
+    PhysicBody* pb = p_GetPBFromEntityID(entID);
     free(data);
     if (moving[entID])
     {
@@ -109,23 +110,39 @@ static void MoveUnit(void* arguments)
         while(moving[entID]){}
     }
     float distance = glmc_vec3_distance(from, goTo);
+    vec3 pos;
+    float newDist = glmc_vec3_distance(from, goTo);
     checkMove[entID] = false;
-    while (t <= 1.0f)
+    vec3 moveVec;
+    while (newDist >= 1.0f)
     {
         if (count <= cycleCount)
         {
+            moving[entID] = true;
+            e_GetEntityPosition(entID, &pos);
+            glmc_vec3_sub(pos, goTo, &moveVec);
+            glmc_vec3_normalize(&moveVec);
+            pb->velocity[0] = -moveVec[0]*5;
+            pb->velocity[2] = -moveVec[2]*5;
+            newDist = glmc_vec3_distance(pos, goTo);
+            count = cycleCount + 1;
+            // Non Physics Movement
+            /* e_GetEntityPosition(entID, &pos);
             moving[entID] = true;
             vec3 move;
             glmc_vec3_lerp(from, goTo, t, move);
             e_SetEnitityPosition(entID, move);
             count = cycleCount + 1;
             t += (deltaTime/distance) * 10;
+            newDist = glmc_vec3_distance(pos, goTo); */
             if (checkMove[entID])
             {
                 break;
             }
         }
     }
+    pb->accel[0] = 0;
+    pb->accel[2] = 0;
     // Kill thread
     pthread_detach(pthread_self());
     moving[entID] = false;

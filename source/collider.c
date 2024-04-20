@@ -11,8 +11,9 @@
 #include <math.h>
 
 static bool AABBCollision (Rect3D a, Rect3D b);
+static void AABBCollisionNormal(Rect3D a, Rect3D b, vec3* normal);
 
-bool c_CheckCollisions(uint64_t ID1, PhysicBody* p1, uint64_t ID2, PhysicBody* p2, double deltaTime)
+CollisionData* c_CheckCollisions(uint64_t ID1, PhysicBody* p1, uint64_t ID2, PhysicBody* p2, double deltaTime)
 {
     ColliderContainer c1 = p1->col;
     ColliderContainer c2 = p2->col;
@@ -21,7 +22,7 @@ bool c_CheckCollisions(uint64_t ID1, PhysicBody* p1, uint64_t ID2, PhysicBody* p
     if ((c1.colliderType == cl_NONE) || (c2.colliderType == cl_NONE))
     {
         printf("Collider does not exist, so collision cannot be tested");
-        return false;
+        return NULL;
     }
     if (((c1.colliderType & cl_AABB) == cl_AABB) && ((c2.colliderType & cl_AABB) == cl_AABB))
     {
@@ -37,7 +38,10 @@ bool c_CheckCollisions(uint64_t ID1, PhysicBody* p1, uint64_t ID2, PhysicBody* p
                                 rB->y + c2.offset[1] + ent2->position[1] + ((ent2->scale[1]-1)*-1) + p2->velocity[1]*deltaTime, 
                                 rB->z + c2.offset[2] + ent2->position[2] + ((ent2->scale[2]-1)*-1) + p2->velocity[2]*deltaTime, 
                                 rB->w*ent2->scale[0], rB->d*ent2->scale[2], rB->h*ent2->scale[1]};
-        return AABBCollision(rectA, rectB);
+        CollisionData* cd = malloc(sizeof(CollisionData));
+        cd->collision = AABBCollision(rectA, rectB);
+        AABBCollisionNormal(rectA, rectB, cd->normal);
+        return cd;
     }
 }
 
@@ -141,6 +145,56 @@ Ray c_GetMouseRay(Camera c)
     return ray;
 }
 
+static void AABBCollisionNormal(Rect3D a, Rect3D b, vec3* normal)
+{
+    float smallest = 9999999999.0f;
+    if (a.x < b.x)
+    {
+        smallest = (a.x+a.w) - b.x;
+        glmc_vec3_copy((vec3){-1,0,0}, normal);
+    }
+    else
+    {
+        smallest = a.x - (b.x+b.w);
+        glmc_vec3_copy((vec3){1,0,0}, normal);
+    }
+
+    if (a.y < b.y)
+    {
+        float dist = (a.y+a.h) - b.y;
+        if (fabs(dist) < fabs(smallest))
+        {
+            smallest = dist;
+            glmc_vec3_copy((vec3){0,-1,0}, normal);
+        }
+    }
+    else
+    {
+        float dist = a.y - (b.y+b.h);
+        if (fabs(dist) < fabs(smallest))
+        {
+            smallest = dist;
+            glmc_vec3_copy((vec3){0,1,0}, normal);
+        }
+    }
+    if (a.z < b.z)
+    {
+        float dist = (a.z+a.d) - b.z;
+        if (fabs(dist) < fabs(smallest))
+        {
+            glmc_vec3_copy((vec3){0,0,-1}, normal);
+        }
+    }
+    else
+    {
+        float dist = a.z - (b.z+b.d);
+        if (fabs(dist) < fabs(smallest))
+        {
+            glmc_vec3_copy((vec3){0,0,1}, normal);
+        }
+    }
+}
+
 
 static bool AABBCollision (Rect3D a, Rect3D b)
 {
@@ -148,3 +202,4 @@ static bool AABBCollision (Rect3D a, Rect3D b)
            (a.y <= (b.h+b.y) && (a.h+a.y) >= b.y) &&
            (a.z <= (b.d+b.z) && (a.d+a.z) >= b.z);
 }
+
