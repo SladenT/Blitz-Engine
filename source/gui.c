@@ -1,5 +1,5 @@
 /*******************************************************************************************
-*	Basic gui 
+*	Creation and handling of all GUIs
 *	Work in progress
 *
 *   Created by Evan Posharow
@@ -24,16 +24,25 @@
 struct nk_glfw glfw = {0};
 struct nk_context* ctx;
 GLFWwindow* win;
-struct nk_font_atlas *atlas;
 int width1, height1;
+struct nk_font *menuFont;
+struct nk_font *basicFont;
  
 void gui_Init(GLFWwindow* window)
 {
+    //size of initial window: 960,540
     win = window;
     ctx = nk_glfw3_init(&glfw, win, NK_GLFW3_INSTALL_CALLBACKS);
 
+    //adding custom fonts
+    {struct nk_font_atlas *atlas;
     nk_glfw3_font_stash_begin(&glfw, &atlas);
+    menuFont = nk_font_atlas_add_from_file(atlas, "../include/nuklear/extra_font/trade-winds.regular.ttf", 50, 0);
+    basicFont = nk_font_atlas_add_from_file(atlas, "../include/nuklear/extra_font/proggy-clean.ttf", 18, 0);
     nk_glfw3_font_stash_end(&glfw);
+    nk_style_set_font(ctx, &menuFont->handle);
+    
+    }
  
 }
 
@@ -42,16 +51,24 @@ void gui_Render()
     glfwPollEvents();
     nk_glfw3_new_frame(&glfw);
 
+    //creates all guis
     gui_admin();
     gui_settings();
     gui_buildings();
+    gui_main_menu();
+    
+
     
     nk_glfw3_render(&glfw, NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER, MAX_ELEMENT_BUFFER);
 }
 
 void gui_admin()
 {
-    if (nk_begin(ctx, "GUI Version 1", nk_rect(0, 0, 230, 250), NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE))
+    int INITIAL_GUI_X_POSITION = 0;
+    int INITIAL_GUI_Y_POSITION = 0;
+    int INITIAL_GUI_WIDTH = 260;
+    int INITIAL_GUI_HEIGHT = 250;
+    if (nk_begin(ctx, "GUI Version 1", nk_rect(INITIAL_GUI_X_POSITION, INITIAL_GUI_Y_POSITION, INITIAL_GUI_WIDTH, INITIAL_GUI_HEIGHT), NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE))
         {
             enum {EASY, HARD};
             static int op = EASY;
@@ -75,8 +92,11 @@ void gui_admin()
 
 void gui_settings()
 {
-    //size of initial window: 960,540
-    if (nk_begin(ctx, "Settings", nk_rect(730, 5, 225, 200), NK_WINDOW_BORDER|NK_WINDOW_TITLE|NK_WINDOW_MOVABLE))
+    int INITIAL_GUI_X_POSITION = 730;
+    int INITIAL_GUI_Y_POSITION = 5;
+    int INITIAL_GUI_WIDTH = 225;
+    int INITIAL_GUI_HEIGHT = 200;
+    if (nk_begin(ctx, "Settings", nk_rect(INITIAL_GUI_X_POSITION, INITIAL_GUI_Y_POSITION, INITIAL_GUI_WIDTH, INITIAL_GUI_HEIGHT), NK_WINDOW_BORDER|NK_WINDOW_TITLE|NK_WINDOW_MOVABLE))
         {
             //repositions gui when window size changes
             nk_window_set_position(ctx, "Settings", nk_vec2(get_width() - 230 , 5));
@@ -92,7 +112,7 @@ void gui_settings()
                  }
             nk_layout_row_end(ctx);
 
-            //Theme selector
+            //Theme selector toggles
             enum {BLACK, BLUE, DARK, RED, WHITE};
             static int current_Theme = RED;
             nk_layout_row_dynamic(ctx, 30, 2);
@@ -131,12 +151,16 @@ void gui_buildings()
 {
     // to do: add nk_rect as constants
     //        add curency and gui for currency
-    //        add main menu
-    if (nk_begin(ctx, "Build", nk_rect(240, 432, 480, 108), NK_WINDOW_BORDER|NK_WINDOW_MOVABLE))
+    int INITIAL_GUI_X_POSITION = 240;
+    int INITIAL_GUI_Y_POSITION = 432;
+    int INITIAL_GUI_WIDTH = 480;
+    int INITIAL_GUI_HEIGHT = 108;
+    if (nk_begin(ctx, "Build", nk_rect(INITIAL_GUI_X_POSITION, INITIAL_GUI_Y_POSITION, INITIAL_GUI_WIDTH, INITIAL_GUI_HEIGHT), NK_WINDOW_BORDER|NK_WINDOW_MOVABLE))
         {   
             //scale position with window
-            int testy = (get_width()/2) - (get_width()/4);
-            nk_window_set_position(ctx, "Build", nk_vec2((get_width()/2) - (get_width()/4) , get_height() - 108));
+            int dynamicX = (get_width()/2) - (get_width()/4);
+            int dynamicY = get_height() - 108;
+            nk_window_set_position(ctx, "Build", nk_vec2(dynamicX , dynamicY));
 
             //scale size with window
             nk_window_set_size(ctx,"Build", nk_vec2(get_width()/2 , 108));
@@ -144,13 +168,14 @@ void gui_buildings()
             nk_layout_row_dynamic(ctx, 20, 1);
             nk_label(ctx, "Price:", NK_TEXT_ALIGN_CENTERED);
 
+            //4 labels for build menu
             nk_layout_row_dynamic(ctx, 20, 4);
             nk_label_colored(ctx, "100 Gold", NK_TEXT_ALIGN_CENTERED, nk_rgb(240, 252, 3));
             nk_label_colored(ctx, "200 Wood",   NK_TEXT_ALIGN_CENTERED, nk_rgb(0, 255, 0));
             nk_label(ctx, "idk", NK_TEXT_ALIGN_CENTERED);
             nk_label(ctx, "zero", NK_TEXT_ALIGN_CENTERED);
-            // nk_label(ctx, "zero", NK_TEXT_ALIGN_CENTERED);
 
+            //4 buttons for build menu
             nk_layout_row_dynamic(ctx, 36, 4);
             if (nk_button_label(ctx, "Buy Units"))
             {
@@ -169,6 +194,46 @@ void gui_buildings()
                 fprintf(stdout, "\nstill testing 2");
             }
             
+
+        }
+    nk_end(ctx);
+}
+
+void gui_main_menu()
+{
+    int INITIAL_GUI_X_POSITION = 0;
+    int INITIAL_GUI_Y_POSITION = 0;
+    int INITIAL_GUI_WIDTH = 960;
+    int INITIAL_GUI_HEIGHT = 540;
+    if (nk_begin(ctx, "Menu", nk_rect(INITIAL_GUI_X_POSITION, INITIAL_GUI_Y_POSITION, INITIAL_GUI_WIDTH, INITIAL_GUI_HEIGHT), NK_WINDOW_BORDER|NK_WINDOW_MOVABLE))
+        {   
+            //scale size to whole screen
+            nk_window_set_size(ctx,"Menu", nk_vec2(get_width() , get_height()));
+
+            //initially hides all gui when main menu is open
+            nk_window_show(ctx, "GUI Version 1", nk_false);
+            nk_window_show(ctx, "Settings", nk_false);
+            nk_window_show(ctx, "Build", nk_false);
+
+            nk_spacer(ctx);
+            nk_layout_row_dynamic(ctx, 100, 1);
+
+            nk_label_colored(ctx, "RTS Game Demo", NK_TEXT_ALIGN_CENTERED, nk_rgb(255, 165, 0));
+            nk_label_colored(ctx, "Made Using Our Custom Blitz Engine!", NK_TEXT_ALIGN_CENTERED, nk_rgb(255, 165, 0));
+            nk_label_colored(ctx, "By: Davis Teigeler, Evan Posharow, and Aaron Hartle", NK_TEXT_ALIGN_CENTERED, nk_rgb(255, 255, 255));
+            if (nk_button_label(ctx, "Start demo"))
+            {
+                //shows all guis again
+                nk_window_show(ctx, "GUI Version 1", nk_true);
+                nk_window_show(ctx, "Settings", nk_true);
+                nk_window_show(ctx, "Build", nk_true);
+
+                //change font ant then hides main menu
+                nk_style_set_font(ctx, &basicFont->handle);
+                nk_window_set_focus(ctx, "Build");
+                nk_window_show(ctx, "Menu", nk_false);
+            }
+
 
         }
     nk_end(ctx);
