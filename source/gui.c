@@ -39,7 +39,7 @@ void gui_Init(GLFWwindow* window)
     {struct nk_font_atlas *atlas;
     nk_glfw3_font_stash_begin(&glfw, &atlas);
     menuFont = nk_font_atlas_add_from_file(atlas, "../include/nuklear/extra_font/trade-winds.regular.ttf", 50, 0);
-    basicFont = nk_font_atlas_add_from_file(atlas, "../include/nuklear/extra_font/proggy-clean.ttf", 18, 0);
+    basicFont = nk_font_atlas_add_from_file(atlas, "../include/nuklear/extra_font/amiko.regular.ttf", 18, 0);
     nk_glfw3_font_stash_end(&glfw);
     nk_style_set_font(ctx, &menuFont->handle);
     
