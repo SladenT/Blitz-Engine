@@ -28,6 +28,10 @@ GLFWwindow* win;
 int width1, height1;
 struct nk_font *menuFont;
 struct nk_font *basicFont;
+
+//game resources
+int wood = 500;
+int gold = 500;
  
 void gui_Init(GLFWwindow* window)
 {
@@ -56,6 +60,7 @@ void gui_Render()
     gui_admin();
     gui_settings();
     gui_buildings();
+    gui_resources();
     gui_main_menu();
     
 
@@ -67,26 +72,20 @@ void gui_admin()
 {
     int INITIAL_GUI_X_POSITION = 0;
     int INITIAL_GUI_Y_POSITION = 0;
-    int INITIAL_GUI_WIDTH = 260;
-    int INITIAL_GUI_HEIGHT = 250;
-    if (nk_begin(ctx, "GUI Version 1", nk_rect(INITIAL_GUI_X_POSITION, INITIAL_GUI_Y_POSITION, INITIAL_GUI_WIDTH, INITIAL_GUI_HEIGHT), NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE))
+    int INITIAL_GUI_WIDTH = 250;
+    int INITIAL_GUI_HEIGHT = 200;
+    if (nk_begin(ctx, "Admin GUI", nk_rect(INITIAL_GUI_X_POSITION, INITIAL_GUI_Y_POSITION, INITIAL_GUI_WIDTH, INITIAL_GUI_HEIGHT), NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE))
         {
-            enum {EASY, HARD};
-            static int op = EASY;
-            static int property = 20;
-            nk_layout_row_static(ctx, 30, 80, 1);
-            if (nk_button_label(ctx, "button"))
+            nk_spacer(ctx);
+            nk_layout_row_dynamic(ctx, 40, 2);
+            if (nk_button_label(ctx, "add gold"))
             {
-                fprintf(stdout, "button pressed\n");
+                gold = gold + 1000;
             }
-
-            nk_layout_row_dynamic(ctx, 30, 2);
-            if (nk_option_label(ctx, "toggle 1", op == EASY)) op = EASY;
-            if (nk_option_label(ctx, "toggle 2", op == HARD)) op = HARD;
-
-            nk_layout_row_dynamic(ctx, 25, 1);
-            nk_property_int(ctx, "Volume:", 0, &property, 100, 10, 1);
-            
+            if (nk_button_label(ctx, "add wood"))
+            {
+                wood = wood + 1000;
+            }
         }
     nk_end(ctx);
 }
@@ -150,8 +149,6 @@ void gui_settings()
 
 void gui_buildings()
 {
-    // to do: add nk_rect as constants
-    //        add curency and gui for currency
     int INITIAL_GUI_X_POSITION = 240;
     int INITIAL_GUI_Y_POSITION = 432;
     int INITIAL_GUI_WIDTH = 480;
@@ -173,26 +170,51 @@ void gui_buildings()
             nk_layout_row_dynamic(ctx, 20, 4);
             nk_label_colored(ctx, "100 Gold", NK_TEXT_ALIGN_CENTERED, nk_rgb(240, 252, 3));
             nk_label_colored(ctx, "200 Wood",   NK_TEXT_ALIGN_CENTERED, nk_rgb(0, 255, 0));
-            nk_label(ctx, "idk", NK_TEXT_ALIGN_CENTERED);
-            nk_label(ctx, "zero", NK_TEXT_ALIGN_CENTERED);
+            nk_label_colored(ctx, "800 Wood", NK_TEXT_ALIGN_CENTERED, nk_rgb(0, 255, 0));
+            nk_label_colored(ctx, "200 Gold", NK_TEXT_ALIGN_CENTERED, nk_rgb(240, 252, 3));
 
             //4 buttons for build menu
             nk_layout_row_dynamic(ctx, 36, 4);
             if (nk_button_label(ctx, "Buy Units"))
             {
-                fprintf(stdout, "\nBought a unit");
+                if(gold >= 100){
+                    gold = gold - 100;
+                    fprintf(stdout, "\nBought a unit");
+                }
+                else{
+                    fprintf(stdout, "\nNot enough Gold");
+                }
+
             }
             if (nk_button_label(ctx, "Build Tree"))
             {
-                fprintf(stdout, "\nBuilt a Tree");
+                if(wood >= 200){
+                    wood = wood - 200;
+                    fprintf(stdout, "\nBuilt Tree");
+                }
+                else{
+                    fprintf(stdout, "\nNot enough Wood");
+                }
             }
-            if (nk_button_label(ctx, "testing 1"))
+            if (nk_button_label(ctx, "Build House"))
             {
-                fprintf(stdout, "\nstill testing 1");
+                if(wood >= 800){
+                    wood = wood - 800;
+                    fprintf(stdout, "\nBuilt House");
+                }
+                else{
+                    fprintf(stdout, "\nNot enough Wood");
+                }
             }
-            if (nk_button_label(ctx, "testing 2"))
+            if (nk_button_label(ctx, "Buy Horse"))
             {
-                fprintf(stdout, "\nstill testing 2");
+                if(gold >= 200){
+                    gold = gold - 200;
+                    fprintf(stdout, "\nBought a Horse");
+                }
+                else{
+                    fprintf(stdout, "\nNot enough Gold");
+                }
             }
             
 
@@ -212,9 +234,10 @@ void gui_main_menu()
             nk_window_set_size(ctx,"Menu", nk_vec2(get_width() , get_height()));
 
             //initially hides all gui when main menu is open
-            nk_window_show(ctx, "GUI Version 1", nk_false);
+            nk_window_show(ctx, "Admin GUI", nk_false);
             nk_window_show(ctx, "Settings", nk_false);
             nk_window_show(ctx, "Build", nk_false);
+            nk_window_show(ctx, "Resources", nk_false);
 
             nk_spacer(ctx);
             nk_layout_row_dynamic(ctx, 100, 1);
@@ -226,9 +249,10 @@ void gui_main_menu()
             {
                 SetGameState(1);
                 //shows all guis again
-                nk_window_show(ctx, "GUI Version 1", nk_true);
+                nk_window_show(ctx, "Admin GUI", nk_true);
                 nk_window_show(ctx, "Settings", nk_true);
                 nk_window_show(ctx, "Build", nk_true);
+                nk_window_show(ctx, "Resources", nk_true);
 
                 //change font ant then hides main menu
                 nk_style_set_font(ctx, &basicFont->handle);
@@ -236,6 +260,40 @@ void gui_main_menu()
                 nk_window_show(ctx, "Menu", nk_false);
             }
 
+
+        }
+    nk_end(ctx);
+}
+
+void gui_resources()
+{
+    int INITIAL_GUI_X_POSITION = 360;
+    int INITIAL_GUI_Y_POSITION = 0;
+    int INITIAL_GUI_WIDTH = 240;
+    int INITIAL_GUI_HEIGHT = 108;
+    if (nk_begin(ctx, "Resources", nk_rect(INITIAL_GUI_X_POSITION, INITIAL_GUI_Y_POSITION, INITIAL_GUI_WIDTH, INITIAL_GUI_HEIGHT), NK_WINDOW_BORDER|NK_WINDOW_MOVABLE))
+        {   
+            int dynamicX = (get_width()/2) - 120;
+            int dynamicY = 0;
+            nk_window_set_position(ctx, "Resources", nk_vec2(dynamicX , dynamicY));
+
+            nk_layout_row_dynamic(ctx, 20, 1);
+            nk_label(ctx, "Resources:", NK_TEXT_ALIGN_CENTERED);
+
+            nk_layout_row_dynamic(ctx, 20, 2);
+
+            //Convert ints to strings
+            int length1 = snprintf( NULL, 0, "%d", gold );
+            int length2 = snprintf( NULL, 0, "%d", wood );
+            char* str_gold = malloc( length1 + 1 );
+            char* str_wood = malloc( length2 + 1 );
+            snprintf( str_gold, length1 + 1, "%d", gold );
+            snprintf( str_wood, length2 + 1, "%d", wood );
+
+            nk_label_colored(ctx, "Gold", NK_TEXT_ALIGN_CENTERED, nk_rgb(240, 252, 3));
+            nk_label_colored(ctx, "Wood", NK_TEXT_ALIGN_CENTERED, nk_rgb(0, 255, 0));
+            nk_label(ctx, str_gold, NK_TEXT_ALIGN_CENTERED);
+            nk_label(ctx, str_wood, NK_TEXT_ALIGN_CENTERED);
 
         }
     nk_end(ctx);
