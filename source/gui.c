@@ -17,6 +17,7 @@
 #include <nuklear/nuklear.h>
 #include <nuklear/nuklear_glfw_gl3.h>
 #include <nuklear/style.c>
+#include "game.h"
 
 #define MAX_VERTEX_BUFFER 512 * 1024
 #define MAX_ELEMENT_BUFFER 128 * 1024
@@ -223,6 +224,7 @@ void gui_main_menu()
             nk_label_colored(ctx, "By: Davis Teigeler, Evan Posharow, and Aaron Hartle", NK_TEXT_ALIGN_CENTERED, nk_rgb(255, 255, 255));
             if (nk_button_label(ctx, "Start demo"))
             {
+                SetGameState(1);
                 //shows all guis again
                 nk_window_show(ctx, "GUI Version 1", nk_true);
                 nk_window_show(ctx, "Settings", nk_true);

@@ -11,6 +11,7 @@
 #include "entity.h"
 #include "resimport.h"
 #include "material.h"
+#include "utility.h"
 #include <pthread.h>
 #include <unistd.h>
 
@@ -22,6 +23,8 @@ short selectPO = -1;
 short movePO   = -1;
 
 double deltaTime;
+
+uint64_t gameState = 0;
 
 struct moveData
 {
@@ -49,10 +52,30 @@ bool checkMove[65536];
 // Selection
 uint64_t selectedEntity = UINT64_MAX;
 
+uint64_t GetGameState(void)
+{
+    return gameState;
+}
+void SetGameState(uint64_t state)
+{
+    gameState = state;
+}
+
+static void MouseWheelHandler(GLFWwindow* window, double xoffset, double yoffset)
+{
+    // yOffset is the mouse scroll moving
+    if (gameState == 1)
+    {
+        cam_BeginLerp(mainCamera->position, (vec3){mainCamera->position[0], mainCamera->position[1]+copysign(1, yoffset), mainCamera->position[2]}, 1.0f, deltaTime);
+    }
+}
+
+
 void GameInitialize(void)
 {
     mainWindow = r3d_getMainWindow();
     mainCamera = cam_GetMainCamera();
+    glfwSetScrollCallback(mainWindow, MouseWheelHandler);
 
     cam_TranslateCameraBy(mainCamera, (vec3){0.0f, 8.0, 8.0f});
 
@@ -170,6 +193,7 @@ static void MoveUnit(void* arguments)
 void PlayerControls(double d_deltaTime)
 {
     deltaTime = d_deltaTime;
+    cam_LerpLoop(deltaTime);
     if (glfwGetKey(mainWindow, GLFW_KEY_W) == GLFW_PRESS)
     {
         cam_TranslateCameraBy(mainCamera, (vec3){0.0f,0.0f,-6.0 * deltaTime});

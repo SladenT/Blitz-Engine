@@ -19,6 +19,10 @@ void cam_TranslateCameraBy(Camera *cam, vec3 pos);
 void cam_GetCamTransform(Camera cam, mat4 view);
 
 
+void cam_LerpLoop(double deltaTime);
+void cam_BeginLerp(vec3 start, vec3 end, float speedF, double deltaTime);
+
+
 
 
 

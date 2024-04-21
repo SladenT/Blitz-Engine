@@ -50,11 +50,15 @@ int main(void)
         {
             deltaTime = 0;
         }
-        PlayerControls(deltaTime);
+        if (GetGameState() == 1)
+        {
+            PlayerControls(deltaTime);
         
-        // Engine Updates
-        p_PhysicsUpdate(deltaTime);
-        r3d_RenderPass(window, deltaTime);
+            // Engine Updates
+            p_PhysicsUpdate(deltaTime);
+            r3d_RenderPass(window, deltaTime);
+        }
+        
         // Render the GUI last, as it disables the depth bit testing
 		gui_Render();
         glfwSwapBuffers(window);
