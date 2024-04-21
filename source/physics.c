@@ -152,6 +152,7 @@ void p_PhysicsUpdate(double deltaTime)
                              e1->position[1] + (moveY), e1->position[2] + (moveZ)});
         
         // check for collisions
+        
         for (int j = 0; j < physicCounter; j++)
         {
             if (j == i){continue;}
@@ -159,6 +160,7 @@ void p_PhysicsUpdate(double deltaTime)
             CollisionData* cd = c_CheckCollisions(body->entity, body, body2->entity, body2, deltaTime);
             if (cd->collision)
             {
+                // Cancel movement in the collision normal
                 if (cd->normal[0] != 0)
                 {
                     e_SetEnitityPosition(body->entity, (vec3){body->prevPos[0], body->prevPos[1] + (moveY), body->prevPos[2] + (moveZ)});
@@ -171,7 +173,6 @@ void p_PhysicsUpdate(double deltaTime)
                 {
                     e_SetEnitityPosition(body->entity, (vec3){body->prevPos[0] + (moveX), body->prevPos[1] + (moveY), body->prevPos[2]});
                 }
-
                 // Newton's Law (TODO: Change to reflection about the normal)
                 body->velocity[0] += -body->velocity[0]*body->bounce*body->friction*body2->friction;
                 body->velocity[1] += -body->velocity[1]*2*body->bounce;
@@ -184,6 +185,7 @@ void p_PhysicsUpdate(double deltaTime)
                     body2->velocity[2] += body->velocity[2]*body->bounce*body->friction;
                 }
             }
+            free(cd);
         }
     }
 }

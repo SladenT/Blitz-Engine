@@ -49,6 +49,21 @@ Material* mat_GetMatFromID(int ID)
     return (Material*)idLocs[ID];
 }
 
+MatAtt* mat_GetMaterialAttributeFromID(int ID, const char* name)
+{
+    Material* mat = (Material*)idLocs[ID];
+    MatAtt *curMemOffset = mat->matAttributes;
+    for (int i = 0; i < mat->count; i++)
+    {
+        if (strcmp(curMemOffset->uniformName, name) == 0)
+        {
+            return curMemOffset;
+        }
+        curMemOffset += curMemOffset->size;
+    }
+    return NULL;
+}
+
 // TODO: Support for more data types
 void mat_SetShaderFromMaterial(Material *mat, Shader s)
 {

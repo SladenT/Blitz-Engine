@@ -10,6 +10,7 @@
 #include "physics.h"
 #include "entity.h"
 #include "resimport.h"
+#include "material.h"
 #include <pthread.h>
 #include <unistd.h>
 
@@ -58,6 +59,7 @@ void GameInitialize(void)
     // Initial objects
     MeshData box = res_ImportMesh("../res/meshes/box.obj");
     MeshData bush = res_ImportMesh("../res/meshes/bush_01.obj");
+    MeshData Character3D = res_ImportMesh("../res/meshes/Character3D.obj");
 
     Shader s = sh_BuildShader("defdir.vs", "defdir.fs");
     Shader tile = sh_BuildShader("tileable.vs", "tileable.fs");
@@ -69,11 +71,12 @@ void GameInitialize(void)
     e2p->mask += object_UNITALLY;
 
     uint64_t ent2 = e_CreateEntity();
-    //e_SetEnitityScale(ent2, (vec3) {0.03,0.03,0.03});
     e_SetEnitityPosition(ent2, (vec3) {-5.0,0,0});
     PhysicBody* e1p = p_MakePhysicBody(ent2, false);
     c_SetDefaultAABB(e1p);
     e1p->mask += object_UNITALLY;
+    Rect3D* rect = e1p->col.mem;
+    rect->y = 1;
 
     uint64_t ent3 = e_CreateEntity();
     e_SetEnitityScale(ent3, (vec3) {0.03,0.03,0.03});
@@ -87,7 +90,7 @@ void GameInitialize(void)
     e3p->mask += object_GROUND;
 
     r3d_GenerateFromMeshData(box, s, ent, mat_CreateDefaultMaterial(1, ent, false));
-    r3d_GenerateFromMeshData(box, s, ent2, mat_CreateDefaultMaterial(1, ent2, false));
+    r3d_GenerateFromMeshData(Character3D, s, ent2, mat_CreateDefaultMaterial(1, ent2, false));
     r3d_GenerateFromMeshData(bush, s, ent3, mat_CreateDefaultMaterial(2, ent3, false));
     r3d_GenerateFromMeshData(box, tile, ent4, mat_CreateDefaultMaterial(4, ent4, false));
 }
@@ -111,6 +114,7 @@ static void MoveUnit(void* arguments)
     }
     float distance = glmc_vec3_distance(from, goTo);
     vec3 pos;
+    vec3 rot;
     float newDist = glmc_vec3_distance(from, goTo);
     checkMove[entID] = false;
     vec3 moveVec;
@@ -119,6 +123,10 @@ static void MoveUnit(void* arguments)
         if (count <= cycleCount)
         {
             moving[entID] = true;
+
+            
+
+            // Movement
             e_GetEntityPosition(entID, &pos);
             glmc_vec3_sub(pos, goTo, &moveVec);
             glmc_vec3_normalize(&moveVec);
@@ -126,6 +134,17 @@ static void MoveUnit(void* arguments)
             pb->velocity[2] = -moveVec[2]*5;
             newDist = glmc_vec3_distance(pos, goTo);
             count = cycleCount + 1;
+
+            // Rotation
+            float xAng = acos(moveVec[0]);
+            float yAng = asin(moveVec[2]);
+            float angle = glmc_vec3_angle((vec3){-1,0,0}, (vec3){moveVec[0], 0, moveVec[2]});
+            if (moveVec[2] < 0)
+            {
+                angle = (2*3.14) - angle;
+                
+            }
+            e_SetEnitityRotation(entID, (vec3){0, angle + (3.14/2), 0});
             // Non Physics Movement
             /* e_GetEntityPosition(entID, &pos);
             moving[entID] = true;
@@ -141,8 +160,8 @@ static void MoveUnit(void* arguments)
             }
         }
     }
-    pb->accel[0] = 0;
-    pb->accel[2] = 0;
+    pb->velocity[0] = 0;
+    pb->velocity[2] = 0;
     // Kill thread
     pthread_detach(pthread_self());
     moving[entID] = false;

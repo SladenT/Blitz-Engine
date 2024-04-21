@@ -125,3 +125,8 @@ void e_GetEntityPosition(uint64_t id, vec3 *outPos)
     Entity* e = (Entity*)idArr[id];
     glmc_vec3_copy(e->position, outPos);
 }
+void e_GetEntityRotation(uint64_t id, vec3 *outPos)
+{
+    Entity* e = (Entity*)idArr[id];
+    glmc_vec3_copy(e->rotation, outPos);
+}

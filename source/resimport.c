@@ -112,9 +112,17 @@ MeshData res_ImportMesh(const char *pFile)
         mData[index] = mesh->mVertices[i].x;
         mData[index+1] = mesh->mVertices[i].y;
         mData[index+2] = mesh->mVertices[i].z;
-        // TexCoords
-        mData[index+3] = mesh->mTextureCoords[0][i].x;
-        mData[index+4] = mesh->mTextureCoords[0][i].y;
+        if (mesh->mTextureCoords[0] != NULL)
+        {
+            // TexCoords
+            mData[index+3] = mesh->mTextureCoords[0][i].x;
+            mData[index+4] = mesh->mTextureCoords[0][i].y;
+        }
+        else
+        {
+            mData[index+3] = 0.0f;
+            mData[index+4] = 0.0f;
+        }
         // Vertex Normals
         mData[index+5] = mesh->mNormals[i].x;
         mData[index+6] = mesh->mNormals[i].y;
