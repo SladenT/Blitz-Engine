@@ -14,6 +14,8 @@
 #include "utility.h"
 #include <pthread.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <time.h>
 
 GLFWwindow* mainWindow;
 Camera*     mainCamera;
@@ -48,6 +50,25 @@ uint64_t cycleCount = 0;
 bool moving[65536];
 bool checkMove[65536];
 
+// Tree
+MeshData tree;
+Shader s;
+
+// This is an abomination since rand() only goes up to max of an 16 bit unsigned integer, so we have to do some shifts to fill in the gaps
+// However, there are still some minor gaps, in a of one bit, and a gap of two in b.  So technically not very random, but it does the do.
+static double GetFloatInRange(double min, double max)
+{
+	max -= min;
+	uint32_t a = rand()>>4, b = rand()>>5;
+    a = a << 16;
+    b = b << 16;
+    a = a + rand();
+    b = b + rand();
+	double res = ((a*0x1p26)+b) * (1.0/0x1p53);
+	max = res * max;
+	max += min;
+	return max;
+}
 
 // Selection
 uint64_t selectedEntity = UINT64_MAX;
@@ -66,7 +87,31 @@ static void MouseWheelHandler(GLFWwindow* window, double xoffset, double yoffset
     // yOffset is the mouse scroll moving
     if (gameState == 1)
     {
-        cam_BeginLerp(mainCamera->position, (vec3){mainCamera->position[0], mainCamera->position[1]+copysign(1, yoffset), mainCamera->position[2]}, 1.0f, deltaTime);
+        cam_BeginLerp(mainCamera->position, (vec3){mainCamera->position[0], mainCamera->position[1]+(copysign(1, yoffset))*-1, mainCamera->position[2]}, 1.0f, deltaTime);
+    }
+}
+
+static void GenTrees(int count)
+{
+    for (int i = 0; i < count; i++)
+    {
+        float xRange = GetFloatInRange(-20, -5);
+        if (GetFloatInRange(0,1) > 0.5f)
+        {
+            xRange = GetFloatInRange(5, 20);
+        }
+        float yRange = GetFloatInRange(-20, -5);
+        if (GetFloatInRange(0,1) > 0.5f)
+        {
+            yRange = GetFloatInRange(5, 20);
+        }
+        uint64_t treeent = e_CreateEntity();
+        e_SetEnitityScale(treeent, (vec3) {1.5,1.5,1.5});
+        e_SetEnitityPosition(treeent, (vec3) {xRange*2,-3.5,yRange*1.892});
+        PhysicBody* e4p = p_MakePhysicBody(treeent, true);
+        c_SetDefaultAABB(e4p);
+        Rect3D* rect2 = e4p->col.mem;
+        r3d_GenerateFromMeshData(tree, s, treeent, mat_CreateDefaultMaterial(5, treeent, false));
     }
 }
 
@@ -83,8 +128,9 @@ void GameInitialize(void)
     MeshData box = res_ImportMesh("../res/meshes/box.obj");
     MeshData bush = res_ImportMesh("../res/meshes/bush_01.obj");
     MeshData Character3D = res_ImportMesh("../res/meshes/Character3D.obj");
+    tree = res_ImportMesh("../res/meshes/lowpolypine.obj");
 
-    Shader s = sh_BuildShader("defdir.vs", "defdir.fs");
+    s = sh_BuildShader("defdir.vs", "defdir.fs");
     Shader tile = sh_BuildShader("tileable.vs", "tileable.fs");
     uint64_t ent = e_CreateEntity();
     //e_SetEnitityScale(ent, (vec3) {0.03,0.03,0.03});
@@ -102,15 +148,17 @@ void GameInitialize(void)
     rect->y = 1;
 
     uint64_t ent3 = e_CreateEntity();
-    e_SetEnitityScale(ent3, (vec3) {0.03,0.03,0.03});
-    e_SetEnitityPosition(ent3, (vec3) {0.0,-3.5,-3.0});
+    e_SetEnitityScale(ent3, (vec3) {0.02,0.02,0.02});
+    e_SetEnitityPosition(ent3, (vec3) {0.0,-4.2,-3.0});
 
     uint64_t ent4 = e_CreateEntity();
     e_SetEnitityPosition(ent4, (vec3) {0,-5,0});
-    e_SetEnitityScale(ent4, (vec3) {40,1,40});
+    e_SetEnitityScale(ent4, (vec3) {200,1,200});
     PhysicBody* e3p = p_MakePhysicBody(ent4, true);
     c_SetDefaultAABB(e3p);
     e3p->mask += object_GROUND;
+
+    GenTrees(20);
 
     r3d_GenerateFromMeshData(box, s, ent, mat_CreateDefaultMaterial(1, ent, false));
     r3d_GenerateFromMeshData(Character3D, s, ent2, mat_CreateDefaultMaterial(1, ent2, false));

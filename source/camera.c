@@ -97,7 +97,7 @@ void cam_LerpLoop(double deltaTime)
         }
         else
         {
-            if ( mainCam->position[1] < CAM_MIN )
+            if ( mainCam->position[1] < CAM_MIN)
             {
                 mainCam->position[1] = CAM_MIN;
             }

@@ -27,7 +27,7 @@ unsigned int texture;
 ShaderGroup shaderGroups[SHADER_GROUP_MAX_COUNT];
 int shaderCount = 0;
 
-const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+const unsigned int SHADOW_WIDTH = 2048, SHADOW_HEIGHT = 2048;
 unsigned int depthMapFBO;
 unsigned int depthMap;
 Shader depthShadowShader;
@@ -275,20 +275,23 @@ void r3d_RenderPass(GLFWwindow* window, double deltaTime)
     float bValue = 0.5f;
     mat4 camTransform;
     cam_GetCamTransform(*c, camTransform);
+    vec3 outPos;
+    cam_GetCamPosition(*c, outPos);
 
     // END TEMPORARY
     glClear(GL_COLOR_BUFFER_BIT  | GL_DEPTH_BUFFER_BIT);
 
     // Shadow Mapping
     mat4 lightProjection, lightView, lightSpaceMatrix;
-    float near_plane = -10.0f, far_plane = 20.5f;
-    glmc_ortho(-40.0f, 40.0f, -40.0f, 40.0f, near_plane, far_plane, lightProjection);
+    float near_plane = -10.0f*(outPos[1]/12), far_plane = 30.5f*(outPos[1]/8);
+    glmc_ortho(-10.0f*outPos[1], 10.0f*outPos[1], -10.0f*outPos[1], 10.0f*outPos[1], near_plane, far_plane, lightProjection);
     vec3 lightOffset;
     vec3 camPos;
     cam_GetCamPosition(*c, camPos);
     glmc_vec3_add(lightPos, camPos, lightOffset);
     lightOffset[1] = 4;
-    glmc_lookat(lightOffset, (vec3) {4.0f + camPos[0], 0, -3.0f + camPos[2]}, (vec3) {0.0, 1.0, 0.0}, lightView);
+    lightOffset[0] -= 11;
+    glmc_lookat(lightOffset, (vec3) {-7.0f + camPos[0], 0, -3.0f + camPos[2]}, (vec3) {0.0, 1.0, 0.0}, lightView);
     glmc_mat4_mul(lightProjection, lightView, lightSpaceMatrix);
 
     // TODO: Raycast from camera center of screen to landmass, and then get lookat direction and light position from that instead
@@ -341,8 +344,7 @@ void r3d_RenderPass(GLFWwindow* window, double deltaTime)
 
         glUniform3f(lightPosLoc, lightOffset[0], lightOffset[1], lightOffset[2]);
 
-        vec3 outPos;
-        cam_GetCamPosition(*c, outPos);
+        
         glUniform3f(cameraPosLoc, outPos[0], outPos[1], outPos[2]);
 
         // Texture Array 1

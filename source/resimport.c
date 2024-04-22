@@ -95,7 +95,8 @@ MeshData res_ImportMesh(const char *pFile)
     const struct aiScene* scene = aiImportFile( pFile,
                                                 aiProcess_Triangulate            |
                                                 aiProcess_JoinIdenticalVertices  |
-                                                aiProcess_SortByPType);
+                                                aiProcess_SortByPType            |
+                                                aiProcess_GenNormals);
     MeshData md = (MeshData){0};
     if (scene == NULL) 
     {
