@@ -70,11 +70,12 @@ void p_DeletePhysicsBody(PhysicBody* pb)
     ar_Free(physicArena, pb);
 }
 
-// If we only care about the closest
-uint64_t p_CheckRaycast(Ray ray, uint64_t mask)
+// If we only care about the closest (return hitmask as the mask of the object hit)
+uint64_t p_CheckRaycast(Ray ray, uint64_t mask, uint64_t *hitmask)
 {
     float lowest = 99999999999.0f;
     uint64_t lowestID = UINT64_MAX;
+    *hitmask = 0x00000000;
     for (int i = 0; i < physicCounter; i++)
     {
         PhysicBody* body = ar_ArenaIterator(physicArena, &i);
@@ -84,6 +85,7 @@ uint64_t p_CheckRaycast(Ray ray, uint64_t mask)
         {
             if (rayDistance < lowest)
             {
+                *hitmask = body->mask;
                 lowest = rayDistance;
                 lowestID = body->entity;
             }

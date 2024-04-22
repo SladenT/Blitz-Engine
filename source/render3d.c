@@ -39,7 +39,7 @@ GLFWwindow *mainWindowContext;
 
 // Test box
 
-static float vertices[] = {
+/* static float vertices[] = {
 	
 	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, // A
 	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f, // D
@@ -82,7 +82,7 @@ static float vertices[] = {
     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, // D
     -0.5f,  0.5f,  0.5f,  0.0f, 0.0f, // H
 	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f // G
-};
+}; */
 
 // #region Callback Definitions
 static void FramebufferSizeCallback(GLFWwindow *window, int width, int height)
@@ -295,12 +295,8 @@ void r3d_RenderPass(GLFWwindow* window, double deltaTime)
     mat4 lightProjection, lightView, lightSpaceMatrix;
     float near_plane = -10.0f-(outPos[1]), far_plane = 30.5f+(outPos[1]/6);
     glmc_ortho(-12.0f*(outPos[1]/3), 12.0f*(outPos[1]/3), -12.0f*(outPos[1]/3), 12.0f*(outPos[1]/3), near_plane, far_plane, lightProjection);
-    //vec3 lightOffset;
     vec3 camPos;
     cam_GetCamPosition(*c, camPos);
-    //glmc_vec3_add(lightPos, camPos, lightOffset);
-    /* lightOffset[1] = 4;
-    lightOffset[0] -= 11; */
     glmc_lookat(lightPosition, (vec3) {lookAtPos[0], 0, lookAtPos[2]}, (vec3) {0.0, 1.0, 0.0}, lightView);
     glmc_mat4_mul(lightProjection, lightView, lightSpaceMatrix);
 
@@ -316,9 +312,6 @@ void r3d_RenderPass(GLFWwindow* window, double deltaTime)
     lightOffset[0] -= 11;
     glmc_lookat(lightOffset, (vec3) {-7.0f + camPos[0], 0, -3.0f + camPos[2]}, (vec3) {0.0, 1.0, 0.0}, lightView);
     glmc_mat4_mul(lightProjection, lightView, lightSpaceMatrix); */
-
-    // TODO: Raycast from camera center of screen to landmass, and then get lookat direction and light position from that instead
-    // As this is will balance our shadow projection in the middle of the screen, rather than skewing when zooming out.
 
     vec3 lightDir;
     glmc_euler_angles(lightView, lightDir);
@@ -383,9 +376,8 @@ void r3d_RenderPass(GLFWwindow* window, double deltaTime)
             // TODO: modify transform by parent transforms
             glUniformMatrix4fv(vertexTransformLoc, 1, GL_FALSE, (float *)e_GetEntityTransform(model->ID));
             glBindVertexArray(model->mesh.VAO);
-            // TODO: Process materials for the model per shader
+            // Process materials for the model per shader
             mat_SetShaderFromMaterial(mat_GetMatFromID(model->mat), shaderGroups[i].s);
-            // TODO: Need to get the actual vertex count at some point, or change to EBO...
             //glDrawArrays(GL_TRIANGLES, 0, model->vertexCount);
             glDrawElements(GL_TRIANGLES, model->vertexCount, GL_UNSIGNED_INT, 0);
             glBindVertexArray(0);

@@ -18,6 +18,7 @@
 #include <nuklear/nuklear_glfw_gl3.h>
 #include <nuklear/style.c>
 #include "game.h"
+#include "common.h"
 
 #define MAX_VERTEX_BUFFER 512 * 1024
 #define MAX_ELEMENT_BUFFER 128 * 1024
@@ -169,9 +170,9 @@ void gui_buildings()
             //4 labels for build menu
             nk_layout_row_dynamic(ctx, 20, 4);
             nk_label_colored(ctx, "100 Gold", NK_TEXT_ALIGN_CENTERED, nk_rgb(240, 252, 3));
-            nk_label_colored(ctx, "200 Wood",   NK_TEXT_ALIGN_CENTERED, nk_rgb(0, 255, 0));
+            /* nk_label_colored(ctx, "200 Wood",   NK_TEXT_ALIGN_CENTERED, nk_rgb(0, 255, 0));
             nk_label_colored(ctx, "800 Wood", NK_TEXT_ALIGN_CENTERED, nk_rgb(0, 255, 0));
-            nk_label_colored(ctx, "200 Gold", NK_TEXT_ALIGN_CENTERED, nk_rgb(240, 252, 3));
+            nk_label_colored(ctx, "200 Gold", NK_TEXT_ALIGN_CENTERED, nk_rgb(240, 252, 3)); */
 
             //4 buttons for build menu
             nk_layout_row_dynamic(ctx, 36, 4);
@@ -179,14 +180,15 @@ void gui_buildings()
             {
                 if(gold >= 100){
                     gold = gold - 100;
-                    fprintf(stdout, "\nBought a unit");
+                    //fprintf(stdout, "\nBought a unit");
+                    SpawnUnitFromCastle();
                 }
                 else{
                     fprintf(stdout, "\nNot enough Gold");
                 }
 
             }
-            if (nk_button_label(ctx, "Build Tree"))
+            /* if (nk_button_label(ctx, "Build Tree"))
             {
                 if(wood >= 200){
                     wood = wood - 200;
@@ -215,7 +217,7 @@ void gui_buildings()
                 else{
                     fprintf(stdout, "\nNot enough Gold");
                 }
-            }
+            } */
             
 
         }
@@ -251,12 +253,12 @@ void gui_main_menu()
                 //shows all guis again
                 nk_window_show(ctx, "Admin GUI", nk_true);
                 nk_window_show(ctx, "Settings", nk_true);
-                nk_window_show(ctx, "Build", nk_true);
+                //nk_window_show(ctx, "Build", nk_true);
                 nk_window_show(ctx, "Resources", nk_true);
 
                 //change font ant then hides main menu
                 nk_style_set_font(ctx, &basicFont->handle);
-                nk_window_set_focus(ctx, "Build");
+                nk_window_set_focus(ctx, "Resources");
                 nk_window_show(ctx, "Menu", nk_false);
             }
 
@@ -285,8 +287,8 @@ void gui_resources()
             //Convert ints to strings
             int length1 = snprintf( NULL, 0, "%d", gold );
             int length2 = snprintf( NULL, 0, "%d", wood );
-            char* str_gold = malloc( length1 + 1 );
-            char* str_wood = malloc( length2 + 1 );
+            char* str_gold[length1 + 1];
+            char* str_wood[length2 + 1];
             snprintf( str_gold, length1 + 1, "%d", gold );
             snprintf( str_wood, length2 + 1, "%d", wood );
 
@@ -294,9 +296,27 @@ void gui_resources()
             nk_label_colored(ctx, "Wood", NK_TEXT_ALIGN_CENTERED, nk_rgb(0, 255, 0));
             nk_label(ctx, str_gold, NK_TEXT_ALIGN_CENTERED);
             nk_label(ctx, str_wood, NK_TEXT_ALIGN_CENTERED);
-
         }
     nk_end(ctx);
+}
+
+void gui_ShowMenu(bool tru)
+{
+    if (tru)
+    {
+        nk_window_show(ctx, "Build", nk_true);
+        nk_window_set_focus(ctx, "Build");
+    }
+    else
+    {
+        nk_window_show(ctx, "Build", nk_false);
+        nk_window_set_focus(ctx, "Resources");
+    }
+}
+
+bool gui_CheckMouse()
+{
+    return nk_window_is_any_hovered(ctx);
 }
 
 get_height()

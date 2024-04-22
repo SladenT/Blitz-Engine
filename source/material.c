@@ -17,7 +17,7 @@ static bool init = false;
 static void InitMaterials()
 {
     // Allocate 1GB of Virtual memory, and 4 pages of physical (4*4096 KB)
-    matArena = CreateDynamicArena(1, 4);
+    matArena = CreateDynamicArena(1, 16);
 }
 
 int mat_CreateDefaultMaterial(int texID, int entityID, bool isUnique)

@@ -12,6 +12,7 @@
 #include "resimport.h"
 #include "material.h"
 #include "utility.h"
+#include "gui.h"
 #include <pthread.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -27,6 +28,7 @@ short movePO   = -1;
 double deltaTime;
 
 uint64_t gameState = 0;
+uint64_t selectMode = 0;
 
 struct moveData
 {
@@ -50,8 +52,10 @@ uint64_t cycleCount = 0;
 bool moving[65536];
 bool checkMove[65536];
 
-// Tree
+// Graphics data
 MeshData tree;
+MeshData Character3D;
+MeshData bush;
 Shader s;
 
 // This is an abomination since rand() only goes up to max of an 16 bit unsigned integer, so we have to do some shifts to fill in the gaps
@@ -95,15 +99,15 @@ static void GenTrees(int count)
 {
     for (int i = 0; i < count; i++)
     {
-        float xRange = GetFloatInRange(-20, -5);
+        float xRange = GetFloatInRange(-40, -5);
         if (GetFloatInRange(0,1) > 0.5f)
         {
-            xRange = GetFloatInRange(5, 20);
+            xRange = GetFloatInRange(5, 40);
         }
-        float yRange = GetFloatInRange(-20, -5);
+        float yRange = GetFloatInRange(-40, -5);
         if (GetFloatInRange(0,1) > 0.5f)
         {
-            yRange = GetFloatInRange(5, 20);
+            yRange = GetFloatInRange(5, 40);
         }
         uint64_t treeent = e_CreateEntity();
         e_SetEnitityScale(treeent, (vec3) {1.5,1.5,1.5});
@@ -113,6 +117,42 @@ static void GenTrees(int count)
         Rect3D* rect2 = e4p->col.mem;
         r3d_GenerateFromMeshData(tree, s, treeent, mat_CreateDefaultMaterial(5, treeent, false));
     }
+}
+
+static void GenBushes(int count)
+{
+    for (int i = 0; i < count; i++)
+    {
+        float xRange = GetFloatInRange(-40, -1);
+        if (GetFloatInRange(0,1) > 0.5f)
+        {
+            xRange = GetFloatInRange(1, 40);
+        }
+        float yRange = GetFloatInRange(-40, -1);
+        if (GetFloatInRange(0,1) > 0.5f)
+        {
+            yRange = GetFloatInRange(1, 40);
+        }
+        /* uint64_t treeent = e_CreateEntity();
+        e_SetEnitityScale(treeent, (vec3) {1.5,1.5,1.5}); */
+        uint64_t treeent = e_CreateEntity();
+        e_SetEnitityScale(treeent, (vec3) {0.02,0.02,0.02});
+        e_SetEnitityPosition(treeent, (vec3) {xRange*2,-4.2,yRange*1.892});
+        r3d_GenerateFromMeshData(bush, s, treeent, mat_CreateDefaultMaterial(2, treeent, false));
+    }
+}
+
+static uint64_t GenUnit(int x, int y)
+{
+    uint64_t ent2 = e_CreateEntity();
+    e_SetEnitityPosition(ent2, (vec3) {x,-3.9,y});
+    PhysicBody* e1p = p_MakePhysicBody(ent2, false);
+    c_SetDefaultAABB(e1p);
+    e1p->mask += object_UNITALLY;
+    Rect3D* rect = e1p->col.mem;
+    rect->y = 1;
+    r3d_GenerateFromMeshData(Character3D, s, ent2, mat_CreateDefaultMaterial(1, ent2, false));
+    return ent2;
 }
 
 
@@ -126,30 +166,29 @@ void GameInitialize(void)
 
     // Initial objects
     MeshData box = res_ImportMesh("../res/meshes/box.obj");
-    MeshData bush = res_ImportMesh("../res/meshes/bush_01.obj");
-    MeshData Character3D = res_ImportMesh("../res/meshes/Character3D.obj");
+    bush = res_ImportMesh("../res/meshes/bush_01.obj");
+    Character3D = res_ImportMesh("../res/meshes/Character3D.obj");
     tree = res_ImportMesh("../res/meshes/lowpolypine.obj");
+    MeshData castle = res_ImportMesh("../res/meshes/SimpleCastle.obj");
 
     s = sh_BuildShader("defdir.vs", "defdir.fs");
     Shader tile = sh_BuildShader("tileable.vs", "tileable.fs");
-    uint64_t ent = e_CreateEntity();
+    /* uint64_t ent = e_CreateEntity();
     //e_SetEnitityScale(ent, (vec3) {0.03,0.03,0.03});
     e_SetEnitityPosition(ent, (vec3) {5.0,0,0});
     PhysicBody* e2p = p_MakePhysicBody(ent, false);
     c_SetDefaultAABB(e2p);
-    e2p->mask += object_UNITALLY;
+    e2p->mask += object_UNITALLY; */
 
-    uint64_t ent2 = e_CreateEntity();
+    /* uint64_t ent2 = e_CreateEntity();
     e_SetEnitityPosition(ent2, (vec3) {-5.0,0,0});
     PhysicBody* e1p = p_MakePhysicBody(ent2, false);
     c_SetDefaultAABB(e1p);
     e1p->mask += object_UNITALLY;
     Rect3D* rect = e1p->col.mem;
-    rect->y = 1;
+    rect->y = 1; */
 
-    uint64_t ent3 = e_CreateEntity();
-    e_SetEnitityScale(ent3, (vec3) {0.02,0.02,0.02});
-    e_SetEnitityPosition(ent3, (vec3) {0.0,-4.2,-3.0});
+    
 
     uint64_t ent4 = e_CreateEntity();
     e_SetEnitityPosition(ent4, (vec3) {0,-5,0});
@@ -158,12 +197,21 @@ void GameInitialize(void)
     c_SetDefaultAABB(e3p);
     e3p->mask += object_GROUND;
 
-    GenTrees(20);
+    uint64_t ent5 = e_CreateEntity();
+    e_SetEnitityPosition(ent5, (vec3) {0,-4,0});
+    PhysicBody* e4p = p_MakePhysicBody(ent5, true);
+    c_SetDefaultAABB(e4p);
+    Rect3D* rect2 = e4p->col.mem;
+    rect2->z = -3.8;
+    rect2->d = 5.8;
+    rect2->w = 6.5;
+    e4p->mask += object_BUILDING;
+    GenTrees(100);
 
-    r3d_GenerateFromMeshData(box, s, ent, mat_CreateDefaultMaterial(1, ent, false));
-    r3d_GenerateFromMeshData(Character3D, s, ent2, mat_CreateDefaultMaterial(1, ent2, false));
-    r3d_GenerateFromMeshData(bush, s, ent3, mat_CreateDefaultMaterial(2, ent3, false));
+    //r3d_GenerateFromMeshData(box, s, ent, mat_CreateDefaultMaterial(1, ent, false));
+    //r3d_GenerateFromMeshData(Character3D, s, ent2, mat_CreateDefaultMaterial(1, ent2, false));
     r3d_GenerateFromMeshData(box, tile, ent4, mat_CreateDefaultMaterial(4, ent4, false));
+    r3d_GenerateFromMeshData(castle, s, ent5, mat_CreateDefaultMaterial(6, ent5, false));
 }
 
 static void MoveUnit(void* arguments)
@@ -194,9 +242,6 @@ static void MoveUnit(void* arguments)
         if (count <= cycleCount)
         {
             moving[entID] = true;
-
-            
-
             // Movement
             e_GetEntityPosition(entID, &pos);
             glmc_vec3_sub(pos, goTo, &moveVec);
@@ -225,7 +270,7 @@ static void MoveUnit(void* arguments)
             count = cycleCount + 1;
             t += (deltaTime/distance) * 10;
             newDist = glmc_vec3_distance(pos, goTo); */
-            if (checkMove[entID])
+            if (checkMove[entID] || count > 1000000) // Sanity check
             {
                 break;
             }
@@ -236,6 +281,20 @@ static void MoveUnit(void* arguments)
     // Kill thread
     pthread_detach(pthread_self());
     moving[entID] = false;
+    pthread_exit(pthread_self());
+}
+
+void SpawnUnitFromCastle()
+{
+    uint64_t entity = GenUnit(2, 2);
+    Entity* ent = e_GetEntity(entity);
+    pthread_t thread;
+    struct moveData *data = malloc(sizeof(struct moveData));
+    data->id = entity;
+    data->moveTo[0] = 0;
+    data->moveTo[1] = -4.1 + (ent->scale[1]);
+    data->moveTo[2] = 6;
+    pthread_create(&thread, NULL, MoveUnit, data);
 }
 
 void PlayerControls(double d_deltaTime)
@@ -258,7 +317,6 @@ void PlayerControls(double d_deltaTime)
     {
         cam_TranslateCameraBy(mainCamera, (vec3){6.0 * deltaTime,0.0f,0.0f});
     }
-
     // Selection Controls
     if (glfwGetMouseButton(mainWindow, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
     {
@@ -270,16 +328,31 @@ void PlayerControls(double d_deltaTime)
     }
     if (selectPO == 1)
     {
-        selectPO = 0;
-        Ray ray = c_GetMouseRay(*mainCamera);
-        uint64_t ent = p_CheckRaycast(ray, object_UNITALLY);
-        if (ent != UINT64_MAX)
+        if (!gui_CheckMouse())
         {
-            selectedEntity = ent;
-        }
-        else
-        {
-            selectedEntity = UINT64_MAX;
+            selectPO = 0;
+            Ray ray = c_GetMouseRay(*mainCamera);
+            uint64_t hitmask;
+            uint64_t ent = p_CheckRaycast(ray, object_UNITALLY + object_BUILDING, &hitmask);
+            if (ent != UINT64_MAX && ((hitmask & object_UNITALLY) == object_UNITALLY))
+            {
+                selectedEntity = ent;
+                selectMode = 0;
+                gui_ShowMenu(0);
+            }
+            else if((hitmask & object_BUILDING) == object_BUILDING)
+            {
+                // Change control mode to building menu
+                selectedEntity = ent;
+                selectMode = 1;
+                gui_ShowMenu(1);
+            }
+            else
+            {
+                selectedEntity = UINT64_MAX;
+                selectMode = 0;
+                gui_ShowMenu(0);
+            }
         }
     }
 
@@ -295,7 +368,7 @@ void PlayerControls(double d_deltaTime)
     if (movePO == 1)
     {
         movePO = 0;
-        if (selectedEntity != UINT64_MAX)
+        if (selectedEntity != UINT64_MAX && (selectMode == 0))
         {
             Ray ray = c_GetMouseRay(*mainCamera);
             float dist = p_CheckRaycastDist(ray, object_GROUND);
