@@ -21,11 +21,6 @@
 
 static double lastTime;
 
-void test(const char* var)
-{
-    printf(var);
-}
-
 int main(void)
 {
     // Engine Initialization Steps
