@@ -4,11 +4,11 @@
 *
 *   Created by Aaron Hartle
 ********************************************************************************************/
-#include <stdio.h>
+/* #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <AL.h>
-#include <ALC.h>
+#include <openal-soft/AL.h>
+#include <openal-soft/ALC.h>
 
 
 // Function to initialize OpenAL
@@ -36,30 +36,30 @@ void playSoundEffect(const char* filename) {
     
     // Generate buffer
     alGenBuffers(1, &buffer);
-    checkALError("alGenBuffers");
+    //checkALError("alGenBuffers");
 
     // Load WAV file
     ALsizei size, frequency;
     ALenum format;
     ALvoid* data;
     alutLoadWAVFile(filename, &format, &data, &size, &frequency);
-    checkALError("alutLoadWAVFile");
+    //checkALError("alutLoadWAVFile");
 
     // Set buffer data
     alBufferData(buffer, format, data, size, frequency);
-    checkALError("alBufferData");
+    //checkALError("alBufferData");
 
     // Generate source
     alGenSources(1, &source);
-    checkALError("alGenSources");
+    //checkALError("alGenSources");
 
     // Attach buffer to source
     alSourcei(source, AL_BUFFER, buffer);
-    checkALError("alSourcei");
+    //checkALError("alSourcei");
 
     // Play source
     alSourcePlay(source);
-    checkALError("alSourcePlay");
+    //checkALError("alSourcePlay");
 
     // Wait for sound to finish playing
     ALint source_state;
@@ -78,7 +78,7 @@ void handleButtonClick() {
     playSoundEffect("click_sound_1.wav");
 }
 
-int main() {
+int initialize() {
     // Initialize OpenAL
     if (!initOpenAL()) {
         return EXIT_FAILURE;
@@ -91,8 +91,8 @@ int main() {
     }
 
     // Clean up OpenAL
-    cleanupOpenAL();
+    //cleanupOpenAL();
 
     return EXIT_SUCCESS;
-}
+} */
 

@@ -35,7 +35,6 @@ int main(void)
     gui_Init(window);
     p_PhysicsInit();
     debug_Init();
-
     // Game initialization
     GameInitialize();
 

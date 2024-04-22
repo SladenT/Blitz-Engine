@@ -18,6 +18,7 @@
                 "-lcglm",
                 "-lgladlib",
                 "-lglfw3",
+                "-lsoft_oal",
                 "-lstbilib",
                 "-lopengl32",
                 "-lpthread",
