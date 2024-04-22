@@ -42,4 +42,4 @@ This will create your window and begin the engine functions.  You can then use t
 
 This project requires the Visual C Redistributable, at least 2019, to build and run.  It has been tested on Windows 7 and Windows 11.
 
-2456 lines of original code (as of commit 33)
+3254 lines of original code (as of commit 60)
