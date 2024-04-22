@@ -11,6 +11,8 @@
 #include "entity.h"
 #include "material.h"
 #include "resimport.h"
+#include "collider.h"
+#include "physics.h"
 #include <cglm/call.h>
 #include <stdio.h>
 #include "stb_image.h"
@@ -282,8 +284,29 @@ void r3d_RenderPass(GLFWwindow* window, double deltaTime)
     glClear(GL_COLOR_BUFFER_BIT  | GL_DEPTH_BUFFER_BIT);
 
     // Shadow Mapping
+    Ray ray = c_GetCameraRay(*c, SCR_WIDTH/2, SCR_HEIGHT/2);
+    float dist = p_CheckRaycastDist(ray, 0X00000002); // Ground mask
+    float dirX = ray.dir[0] * dist;
+    float dirY = ray.dir[1] * dist;
+    float dirZ = ray.dir[2] * dist;
+    vec3 lookAtPos = {ray.origin[0] + dirX, 0, ray.origin[2] + dirZ};
+    vec3 lightPosition = {lookAtPos[0]-2, 4, lookAtPos[2] - 1};
+
     mat4 lightProjection, lightView, lightSpaceMatrix;
-    float near_plane = -10.0f*(outPos[1]/12), far_plane = 30.5f*(outPos[1]/8);
+    float near_plane = -10.0f-(outPos[1]), far_plane = 30.5f+(outPos[1]/6);
+    glmc_ortho(-12.0f*(outPos[1]/3), 12.0f*(outPos[1]/3), -12.0f*(outPos[1]/3), 12.0f*(outPos[1]/3), near_plane, far_plane, lightProjection);
+    //vec3 lightOffset;
+    vec3 camPos;
+    cam_GetCamPosition(*c, camPos);
+    //glmc_vec3_add(lightPos, camPos, lightOffset);
+    /* lightOffset[1] = 4;
+    lightOffset[0] -= 11; */
+    glmc_lookat(lightPosition, (vec3) {lookAtPos[0], 0, lookAtPos[2]}, (vec3) {0.0, 1.0, 0.0}, lightView);
+    glmc_mat4_mul(lightProjection, lightView, lightSpaceMatrix);
+
+    // OLD SHADOW MAP
+    /* mat4 lightProjection, lightView, lightSpaceMatrix;
+    float near_plane = -10.0f*(outPos[1]/10), far_plane = 30.5f*(outPos[1]/8);
     glmc_ortho(-10.0f*outPos[1], 10.0f*outPos[1], -10.0f*outPos[1], 10.0f*outPos[1], near_plane, far_plane, lightProjection);
     vec3 lightOffset;
     vec3 camPos;
@@ -292,7 +315,7 @@ void r3d_RenderPass(GLFWwindow* window, double deltaTime)
     lightOffset[1] = 4;
     lightOffset[0] -= 11;
     glmc_lookat(lightOffset, (vec3) {-7.0f + camPos[0], 0, -3.0f + camPos[2]}, (vec3) {0.0, 1.0, 0.0}, lightView);
-    glmc_mat4_mul(lightProjection, lightView, lightSpaceMatrix);
+    glmc_mat4_mul(lightProjection, lightView, lightSpaceMatrix); */
 
     // TODO: Raycast from camera center of screen to landmass, and then get lookat direction and light position from that instead
     // As this is will balance our shadow projection in the middle of the screen, rather than skewing when zooming out.
@@ -342,7 +365,8 @@ void r3d_RenderPass(GLFWwindow* window, double deltaTime)
         glUniform3f(glGetUniformLocation(shaderGroups[i].s.ID, "lightDirectional"), lightDir[0], lightDir[1], lightDir[2]);
         
 
-        glUniform3f(lightPosLoc, lightOffset[0], lightOffset[1], lightOffset[2]);
+        glUniform3f(lightPosLoc, lightPosition[0], lightPosition[1], lightPosition[2]);
+        //glUniform3f(lightPosLoc, lightOffset[0], lightOffset[1], lightOffset[2]);
 
         
         glUniform3f(cameraPosLoc, outPos[0], outPos[1], outPos[2]);

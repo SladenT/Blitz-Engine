@@ -9,6 +9,7 @@ void c_SetDefaultAABB(PhysicBody* body);
 
 float c_RayAABBIntersection(Ray r, Rect3D a, uint64_t entID);
 Ray c_GetMouseRay(Camera c);
+Ray c_GetCameraRay(Camera c, int X, int Y);
 
 
 
