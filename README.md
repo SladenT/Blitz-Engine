@@ -29,7 +29,7 @@ while (!glfwWindowShouldClose(window))
 }
 ```
 
-This will create your window and begin the engine functions.  You can then use the various libraries (such as entity.h, resimport.h, and camera.h) to create entities, import models and move the camer around.
+This will create your window and begin the engine functions.  You can then use the various libraries (such as entity.h, resimport.h, and camera.h) to create entities, import models and move the camera around.
 
 ## Demo Build Instructions
 
@@ -42,4 +42,4 @@ This will create your window and begin the engine functions.  You can then use t
 
 This project requires the Visual C Redistributable, at least 2019, to build and run.  It has been tested on Windows 7 and Windows 11.
 
-3254 lines of original code (as of commit 60)
+3254 lines of original code (as of commit 61)
